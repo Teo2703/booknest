@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Checkout | BookNest</title>
+      <link rel="stylesheet" href="../css/style.css">
+   </head>
+   <body>
+      <div class="topbar">
+         <div class="container"><span>Mini Online Bookstore</span><span>Free local delivery for orders above RM80</span></div>
+      </div>
+      <header class="navbar">
+         <div class="container nav-inner">
+            <a class="brand" href="index.html">Book<span>Nest</span></a>
+            <nav class="nav-links"><a href="index.html">Home</a><a href="books.html">Books</a><a href="cart.html">Cart</a><a href="order-history.html">Orders</a><a href="group.html">Group</a><a href="login.html">Login</a></nav>
+         </div>
+      </header>
+      <section class="page-title">
+         <div class="container">
+            <p class="eyebrow">Checkout</p>
+            <h1>Confirm Your Order</h1>
+            <p>Enter delivery details and confirm selected books.</p>
+         </div>
+      </section>
+      <main class="section">
+         <div class="container two-col">
+            <form class="form-card">
+               <h2>Delivery Information</h2>
+               <div class="form-grid">
+                  <div class="field"><label>Full Name</label><input class="input" placeholder="Enter full name"></div>
+                  <div class="field"><label>Contact Number</label><input class="input" placeholder="Enter phone number"></div>
+               </div>
+               <div class="field"><label>Email</label><input class="input" placeholder="Enter email"></div>
+               <div class="field"><label>Delivery Address</label><textarea rows="4" placeholder="Enter delivery address"></textarea></div>
+               <div class="field">
+                  <label>Payment Method</label>
+                  <select>
+                     <option>Cash on Delivery</option>
+                     <option>Online Transfer</option>
+                  </select>
+               </div>
+               <a class="btn" href="order-history.html">Place Order</a>
+            </form>
+            <aside class="summary">
+               <h2>Order Summary</h2>
+               <div class="summary-row"><span>The Quiet Library x 1</span><strong>RM42.90</strong></div>
+               <div class="summary-row"><span>Learning Web Apps x 1</span><strong>RM58.00</strong></div>
+               <div class="summary-row total"><span>Total</span><span>RM100.90</span></div>
+               <p class="notice">Static prototype only. Final Section B can connect this form to PHP and MySQL.</p>
+            </aside>
+         </div>
+      </main>
+      <footer class="footer">
+         <div class="container footer-grid">
+            <div>
+               <h3>BookNest</h3>
+               <p>A clean static prototype for the Mini Online Bookstore e-commerce system.</p>
+            </div>
+            <div>
+               <h4>Customer</h4>
+               <a href="books.html">Browse Books</a><a href="cart.html">Shopping Cart</a><a href="checkout.html">Checkout</a>
+            </div>
+            <div>
+               <h4>Admin</h4>
+               <a href="admin-dashboard.html">Dashboard</a><a href="manage-books.html">Manage Books</a><a href="manage-orders.html">Manage Orders</a>
+            </div>
+         </div>
+      </footer>
+   </body>
+</html>

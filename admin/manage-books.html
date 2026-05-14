@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Books | BookNest</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="container">
+            <span>Mini Online Bookstore</span>
+            <span>Admin book management</span>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="container nav-inner">
+            <a class="brand" href="index.html">
+                Book<span>Nest</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="books.html">Books</a>
+                <a href="group.html">Group</a>
+                <a href="login.html">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <p class="eyebrow">Admin Area</p>
+            <h1>Manage Books</h1>
+            <p>Admin can add, edit, delete, and update book records.</p>
+        </div>
+    </section>
+
+    <!-- Main Section -->
+    <main class="section">
+        <div class="container admin-layout">
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a class="active" href="manage-books.html">Manage Books</a>
+                <a href="manage-orders.html">Manage Orders</a>
+                <a href="index.html">Logout</a>
+            </aside>
+
+            <!-- Manage Books Content -->
+            <section>
+
+                <!-- Action Area -->
+                <div class="actions" style="margin-top: 0; margin-bottom: 1rem;">
+                    <a class="btn" href="#add-book">Add New Book</a>
+                    <input 
+                        class="input" 
+                        style="max-width: 320px;" 
+                        placeholder="Search book record"
+                    >
+                </div>
+
+                <!-- Book Table -->
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Book Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>B001</td>
+                                <td>The Quiet Library</td>
+                                <td>Mira Tan</td>
+                                <td>Fiction</td>
+                                <td>RM42.90</td>
+                                <td>15</td>
+                                <td>
+                                    <a class="btn secondary" href="#">Edit</a>
+                                    <a class="btn danger" href="#">Delete</a>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>B002</td>
+                                <td>Learning Web Apps</td>
+                                <td>D. Kumar</td>
+                                <td>Academic</td>
+                                <td>RM58.00</td>
+                                <td>8</td>
+                                <td>
+                                    <a class="btn secondary" href="#">Edit</a>
+                                    <a class="btn danger" href="#">Delete</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add Book Form -->
+                <form id="add-book" class="form-card" style="margin-top: 1.4rem;">
+                    <h2>Add Book Form</h2>
+
+                    <div class="form-grid">
+
+                        <div class="field">
+                            <label>Title</label>
+                            <input class="input" placeholder="Book title">
+                        </div>
+
+                        <div class="field">
+                            <label>Author</label>
+                            <input class="input" placeholder="Author name">
+                        </div>
+
+                        <div class="field">
+                            <label>Category</label>
+                            <select>
+                                <option>Fiction</option>
+                                <option>Academic</option>
+                                <option>Children</option>
+                                <option>Self-Improvement</option>
+                                <option>Comics</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>Price</label>
+                            <input class="input" placeholder="RM">
+                        </div>
+
+                        <div class="field">
+                            <label>Stock</label>
+                            <input class="input" placeholder="Quantity">
+                        </div>
+
+                        <div class="field">
+                            <label>Image File</label>
+                            <input class="input" placeholder="book.jpg">
+                        </div>
+
+                    </div>
+
+                    <div class="field">
+                        <label>Description</label>
+                        <textarea rows="3" placeholder="Book description"></textarea>
+                    </div>
+
+                    <a class="btn" href="#">Save Book</a>
+                </form>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+
+            <div>
+                <h3>BookNest</h3>
+                <p>A clean static prototype for the Mini Online Bookstore e-commerce system.</p>
+            </div>
+
+            <div>
+                <h4>Customer</h4>
+                <a href="books.html">Browse Books</a>
+                <a href="cart.html">Shopping Cart</a>
+                <a href="checkout.html">Checkout</a>
+            </div>
+
+            <div>
+                <h4>Admin</h4>
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="manage-books.html">Manage Books</a>
+                <a href="manage-orders.html">Manage Orders</a>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>

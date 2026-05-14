@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Orders | BookNest</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="container">
+            <span>Mini Online Bookstore</span>
+            <span>Admin order management</span>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="container nav-inner">
+            <a class="brand" href="index.html">
+                Book<span>Nest</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="books.html">Books</a>
+                <a href="group.html">Group</a>
+                <a href="login.html">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <p class="eyebrow">Admin Area</p>
+            <h1>Manage Orders</h1>
+            <p>Admin can review customer orders and update order status.</p>
+        </div>
+    </section>
+
+    <!-- Main Section -->
+    <main class="section">
+        <div class="container admin-layout">
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="manage-books.html">Manage Books</a>
+                <a class="active" href="manage-orders.html">Manage Orders</a>
+                <a href="index.html">Logout</a>
+            </aside>
+
+            <!-- Manage Orders Content -->
+            <section>
+
+                <!-- Search and Filter Area -->
+                <div class="filters" style="grid-template-columns: 2fr 1fr;">
+                    <input 
+                        class="input" 
+                        placeholder="Search by order ID or customer"
+                    >
+
+                    <select>
+                        <option>All Status</option>
+                        <option>Pending</option>
+                        <option>Processing</option>
+                        <option>Completed</option>
+                        <option>Cancelled</option>
+                    </select>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Update</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>#BN1001</td>
+                                <td>Amanda Lee</td>
+                                <td>10 May 2026</td>
+                                <td>RM100.90</td>
+                                <td>
+                                    <span class="status processing">Processing</span>
+                                </td>
+                                <td>
+                                    <select>
+                                        <option>Processing</option>
+                                        <option>Completed</option>
+                                        <option>Cancelled</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>#BN1000</td>
+                                <td>Tan Kai</td>
+                                <td>9 May 2026</td>
+                                <td>RM42.90</td>
+                                <td>
+                                    <span class="status pending">Pending</span>
+                                </td>
+                                <td>
+                                    <select>
+                                        <option>Pending</option>
+                                        <option>Processing</option>
+                                        <option>Completed</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+
+            <div>
+                <h3>BookNest</h3>
+                <p>A clean static prototype for the Mini Online Bookstore e-commerce system.</p>
+            </div>
+
+            <div>
+                <h4>Customer</h4>
+                <a href="books.html">Browse Books</a>
+                <a href="cart.html">Shopping Cart</a>
+                <a href="checkout.html">Checkout</a>
+            </div>
+
+            <div>
+                <h4>Admin</h4>
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="manage-books.html">Manage Books</a>
+                <a href="manage-orders.html">Manage Orders</a>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>

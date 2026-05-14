@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Login | BookNest</title>
+      <link rel="stylesheet" href="../css/style.css">
+   </head>
+   <body>
+      <div class="topbar">
+         <div class="container"><span>Mini Online Bookstore</span><span>Customer and admin login prototype</span></div>
+      </div>
+      <header class="navbar">
+         <div class="container nav-inner">
+            <a class="brand" href="index.html">Book<span>Nest</span></a>
+            <nav class="nav-links"><a href="index.html">Home</a><a href="books.html">Books</a><a href="cart.html">Cart</a><a href="order-history.html">Orders</a><a href="group.html">Group</a><a class="active" href="login.html">Login</a></nav>
+         </div>
+      </header>
+      <section class="page-title">
+         <div class="container">
+            <p class="eyebrow">Account Access</p>
+            <h1>Login</h1>
+            <p>Customers and administrators can log in based on their role.</p>
+         </div>
+      </section>
+      <main class="section">
+         <div class="container auth">
+            <form class="form-card">
+               <h2>Login to BookNest</h2>
+               <div class="field"><label>Email</label><input class="input" type="email" placeholder="customer@example.com"></div>
+               <div class="field"><label>Password</label><input class="input" type="password" placeholder="Enter password"></div>
+               <div class="field">
+                  <label>Role</label>
+                  <select>
+                     <option>Customer</option>
+                     <option>Administrator</option>
+                  </select>
+               </div>
+               <a class="btn" href="index.html">Login</a><a class="btn secondary" href="register.html">Create New Account</a>
+               <p class="small">Final Section B can validate login using PHP session and MySQL.</p>
+            </form>
+         </div>
+      </main>
+      <footer class="footer">
+         <div class="container footer-grid">
+            <div>
+               <h3>BookNest</h3>
+               <p>A clean static prototype for the Mini Online Bookstore e-commerce system.</p>
+            </div>
+            <div>
+               <h4>Customer</h4>
+               <a href="books.html">Browse Books</a><a href="cart.html">Shopping Cart</a><a href="checkout.html">Checkout</a>
+            </div>
+            <div>
+               <h4>Admin</h4>
+               <a href="admin-dashboard.html">Dashboard</a><a href="manage-books.html">Manage Books</a><a href="manage-orders.html">Manage Orders</a>
+            </div>
+         </div>
+      </footer>
+   </body>
+</html>

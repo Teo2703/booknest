@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | BookNest</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="container">
+            <span>Mini Online Bookstore</span>
+            <span>Admin management area</span>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="container nav-inner">
+            <a class="brand" href="index.html">
+                Book<span>Nest</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="books.html">Books</a>
+                <a href="group.html">Group</a>
+                <a href="login.html">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <p class="eyebrow">Admin Area</p>
+            <h1>Admin Dashboard</h1>
+            <p>Overview of bookstore records and management shortcuts.</p>
+        </div>
+    </section>
+
+    <!-- Main Admin Section -->
+    <main class="section">
+        <div class="container admin-layout">
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <a class="active" href="admin-dashboard.html">Dashboard</a>
+                <a href="manage-books.html">Manage Books</a>
+                <a href="manage-orders.html">Manage Orders</a>
+                <a href="index.html">Logout</a>
+            </aside>
+
+            <!-- Dashboard Content -->
+            <section>
+
+                <!-- Statistics Cards -->
+                <div class="stat-grid">
+
+                    <div class="stat">
+                        <span>Total Books</span>
+                        <br>
+                        <strong>48</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Total Orders</span>
+                        <br>
+                        <strong>126</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Pending Orders</span>
+                        <br>
+                        <strong>9</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>Customers</span>
+                        <br>
+                        <strong>84</strong>
+                    </div>
+
+                </div>
+
+                <!-- Recent Orders Header -->
+                <div class="section-head" style="margin-top: 2rem;">
+                    <h2>Recent Orders</h2>
+                    <a class="btn secondary" href="manage-orders.html">View Orders</a>
+                </div>
+
+                <!-- Recent Orders Table -->
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>#BN1001</td>
+                                <td>Amanda Lee</td>
+                                <td>RM100.90</td>
+                                <td>
+                                    <span class="status processing">Processing</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>#BN1000</td>
+                                <td>Tan Kai</td>
+                                <td>RM42.90</td>
+                                <td>
+                                    <span class="status pending">Pending</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+
+            <div>
+                <h3>BookNest</h3>
+                <p>A clean static prototype for the Mini Online Bookstore e-commerce system.</p>
+            </div>
+
+            <div>
+                <h4>Customer</h4>
+                <a href="books.html">Browse Books</a>
+                <a href="cart.html">Shopping Cart</a>
+                <a href="checkout.html">Checkout</a>
+            </div>
+
+            <div>
+                <h4>Admin</h4>
+                <a href="admin-dashboard.html">Dashboard</a>
+                <a href="manage-books.html">Manage Books</a>
+                <a href="manage-orders.html">Manage Orders</a>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>

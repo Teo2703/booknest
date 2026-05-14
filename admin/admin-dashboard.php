@@ -43,10 +43,10 @@ $recentOrders = $conn->query("
             </a>
 
             <nav class="nav-links">
-                <a href="index.php">Home</a>
-                <a href="books.php">Books</a>
-                <a href="group.php">Group</a>
-                <a href="login.php">Login</a>
+                <a href="../index.php">Home</a>
+                <a href="../books.php">Books</a>
+                <a href="../group.php">Group</a>
+                <a href="../login.php">Login</a>
             </nav>
         </div>
     </header>
@@ -135,9 +135,9 @@ $recentOrders = $conn->query("
 
             <div>
                 <h4>Customer</h4>
-                <a href="books.php">Browse Books</a>
-                <a href="cart.php">Shopping Cart</a>
-                <a href="checkout.php">Checkout</a>
+                <a href="../books.php">Browse Books</a>
+                <a href="../cart.php">Shopping Cart</a>
+                <a href="../checkout.php">Checkout</a>
             </div>
 
             <div>

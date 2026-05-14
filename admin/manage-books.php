@@ -44,10 +44,10 @@ if ($search != '') {
             </a>
 
             <nav class="nav-links">
-                <a href="index.php">Home</a>
-                <a href="books.php">Books</a>
-                <a href="group.php">Group</a>
-                <a href="login.php">Login</a>
+                <a href="../index.php">Home</a>
+                <a href="../books.php">Books</a>
+                <a href="../group.php">Group</a>
+                <a href="../login.php">Login</a>
             </nav>
         </div>
     </header>
@@ -70,7 +70,7 @@ if ($search != '') {
                 <a href="admin-dashboard.php">Dashboard</a>
                 <a class="active" href="manage-books.php">Manage Books</a>
                 <a href="manage-orders.php">Manage Orders</a>
-                <a href="index.php">Logout</a>
+                <a href="../index.php">Logout</a>
             </aside>
 
             <!-- Manage Books Content -->
@@ -177,9 +177,9 @@ if ($search != '') {
 
             <div>
                 <h4>Customer</h4>
-                <a href="books.php">Browse Books</a>
-                <a href="cart.php">Shopping Cart</a>
-                <a href="checkout.php">Checkout</a>
+                <a href="../books/books.php">Browse Books</a>
+                <a href="../orders/cart.php">Shopping Cart</a>
+                <a href="../orders/checkout.php">Checkout</a>
             </div>
 
             <div>

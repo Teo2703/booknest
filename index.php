@@ -1,4 +1,22 @@
-<?php include 'app.php'; ?>
+<?php 
+include 'app.php';
+
+// Get 3 most sold books from database
+$featured = $conn->query("
+    SELECT books.*, 
+           COALESCE(SUM(order_items.quantity), 0) AS total_sold
+    FROM books
+    LEFT JOIN order_items ON books.book_id = order_items.book_id
+    GROUP BY books.book_id
+    ORDER BY total_sold DESC
+    LIMIT 3
+");
+
+$featuredBooks = [];
+while ($row = $featured->fetch_assoc()) {
+    $featuredBooks[] = $row;
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -59,53 +77,43 @@
                 </div>
             </div>
             <div class="hero-card">
-                <div class="mock-book"><span>Featured</span><strong>The Quiet Library</strong></div>
-                <div class="mock-book"><span>Academic Pick</span><strong>Learning Web Apps</strong></div>
-                <div class="mock-book"><span>Children</span><strong>Tiny Adventures</strong></div>
+                <?php foreach ($featuredBooks as $b): ?>
+                    <div class="mock-book">
+                        <span><?php echo htmlspecialchars($b['category']); ?></span>
+                        <strong><?php echo htmlspecialchars($b['title']); ?></strong>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
 
+    <!-- Featured Books — most sold, updates automatically -->
     <section class="section">
         <div class="container">
             <div class="section-head">
                 <div>
                     <h2>Featured Books</h2>
-                    <p>Popular books selected for this static prototype.</p>
+                    <p>Most popular books in our store.</p>
                 </div>
                 <a class="btn secondary" href="books/books.php">View All</a>
             </div>
             <div class="grid grid-3">
+                <?php if (empty($featuredBooks)): ?>
+                    <p>No books available yet.</p>
+                <?php endif; ?>
+
+                <?php foreach ($featuredBooks as $b): ?>
                 <article class="card">
-                    <div class="book-cover">The Quiet Library</div>
+                    <div class="book-cover"><?php echo htmlspecialchars($b['title']); ?></div>
                     <div class="card-body">
-                        <span class="tag">Fiction</span>
-                        <h3 class="book-title">The Quiet Library</h3>
-                        <p class="meta">by Mira Tan</p>
-                        <p class="price">RM42.90</p>
-                        <a class="btn secondary" href="books/book-detail.php?id=1">View Details</a>
+                        <span class="tag"><?php echo htmlspecialchars($b['category']); ?></span>
+                        <h3 class="book-title"><?php echo htmlspecialchars($b['title']); ?></h3>
+                        <p class="meta">by <?php echo htmlspecialchars($b['author']); ?></p>
+                        <p class="price">RM<?php echo number_format($b['price'], 2); ?></p>
+                        <a class="btn secondary" href="books/book-detail.php?id=<?php echo $b['book_id']; ?>">View Details</a>
                     </div>
                 </article>
-                <article class="card">
-                    <div class="book-cover blue">Learning Web Apps</div>
-                    <div class="card-body">
-                        <span class="tag">Academic</span>
-                        <h3 class="book-title">Learning Web Apps</h3>
-                        <p class="meta">by D. Kumar</p>
-                        <p class="price">RM58.00</p>
-                        <a class="btn secondary" href="books/book-detail.php?id=2">View Details</a>
-                    </div>
-                </article>
-                <article class="card">
-                    <div class="book-cover green">Tiny Adventures</div>
-                    <div class="card-body">
-                        <span class="tag">Children</span>
-                        <h3 class="book-title">Tiny Adventures</h3>
-                        <p class="meta">by Lily Chen</p>
-                        <p class="price">RM26.50</p>
-                        <a class="btn secondary" href="books/book-detail.php?id=3">View Details</a>
-                    </div>
-                </article>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>

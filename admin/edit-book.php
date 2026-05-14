@@ -74,10 +74,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container nav-inner">
         <a class="brand" href="index.html">Book<span>Nest</span></a>
         <nav class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="books.html">Books</a>
-            <a href="group.html">Group</a>
-            <a href="login.html">Login</a>
+            <a href="../index.php">Home</a>
+            <a href="../books/books.php">Books</a>
+            <a href="../group.html">Group</a>
+            <a href="../login.html">Login</a>
         </nav>
     </div>
 </header>

@@ -69,8 +69,8 @@ $orders = $stmt->get_result();
 
             <nav class="nav-links">
                 <a href="../index.php">Home</a>
-                <a href="../books.php">Books</a>
-                <a href="../group.php">Group</a>
+                <a href="../books/books.php">Books</a>
+                <a href="../group.html">Group</a>
                 <a href="../login.php">Login</a>
             </nav>
         </div>

@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 $title = $_POST['title'];
 $author = $_POST['author'];

@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 $order_id = $_POST['order_id'];
 $status = $_POST['status'];

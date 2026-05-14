@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 if (!isset($_GET['id'])) {
     die("Book ID is missing.");
@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Edit Book | BookNest</title>
-    <link rel="stylesheet" href="css/style.css?v=2">
+    <link rel="stylesheet" href="../css/style.css?v=2">
 </head>
 <body>
 

@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 
@@ -23,7 +23,7 @@ if ($search != '') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Books | BookNest</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>

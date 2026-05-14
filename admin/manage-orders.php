@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
@@ -47,7 +47,7 @@ $orders = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Orders | BookNest</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>

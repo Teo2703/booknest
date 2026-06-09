@@ -119,10 +119,35 @@ a {
     border: 1px solid var(--line);
 }
 
-.update-btn {
-    margin-top: 10px;
+.update-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
+/* SAME SIZE */
+.status-select,
+.update-btn {
+    height: 46px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Fix select width */
+.status-select {
+    width: 150px;   /* control size */
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+}
+
+/* Button style */
+.update-btn:hover {
+    background: #af8565;   /* darker brown */
+    transform: translateY(-1px);
+    color: white;
+}
 .btn.danger {
     background: #a33b2f;
 }
@@ -449,6 +474,7 @@ th {
     background: #fde2e2;
     color: #c0392b;
 }
+
 /* Admin Layout */
 .admin-layout {
     display: grid;

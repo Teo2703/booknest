@@ -48,7 +48,7 @@ $orders = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Orders | BookNest</title>
 
-    <link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/style.css?v=123">
 </head>
 
 <body>
@@ -103,7 +103,7 @@ $orders = $stmt->get_result();
                 <form method="GET" class="filters" style="grid-template-columns:2fr 1fr auto">
                     <input class="input" name="search" placeholder="Search by order ID or customer" value="<?php echo htmlspecialchars($search); ?>">
 
-                    <select name="status">
+                    <select name="status-select">
                         <option>All Status</option>
                         <option <?php if($statusFilter=="Pending") echo "selected"; ?>>Pending</option>
                         <option <?php if($statusFilter=="Processing") echo "selected"; ?>>Processing</option>
@@ -141,7 +141,7 @@ $orders = $stmt->get_result();
                                     </span>
                                 </td>
                                 <td>
-                                    <form method="POST" action="update-order-status.php">
+                                    <form method="POST" action="update-order-status.php" class="update-form">
                                         <input type="hidden" name="order_id" value="<?php echo $order['order_id']; ?>">
 
                                         <select name="status">

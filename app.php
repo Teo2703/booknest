@@ -14,16 +14,30 @@ function isCustomer() {
     return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'customer';
 }
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 function requireLogin() {
-    if (!isLoggedIn()) {
-        $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
+    if (!isset($_SESSION["user_id"])) {
         header("Location: /booknest/auth/login.php");
         exit();
     }
 }
 
 function requireAdmin() {
-    if (!isAdmin()) {
+    requireLogin();
+
+    if (!isset($_SESSION["user_role"]) || $_SESSION["user_role"] !== "admin") {
+        header("Location: /booknest/auth/login.php");
+        exit();
+    }
+}
+
+function requireCustomer() {
+    requireLogin();
+
+    if (!isset($_SESSION["user_role"]) || $_SESSION["user_role"] !== "customer") {
         header("Location: /booknest/auth/login.php");
         exit();
     }

@@ -1,5 +1,6 @@
 <?php
-include '../db.php';
+include '../app.php';
+requireAdmin();
 
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
 $search = isset($_GET['search']) ? $_GET['search'] : '';

@@ -1,5 +1,6 @@
 <?php
-include '../db.php';
+include '../app.php';
+requireAdmin();
 
 $totalBooks = $conn->query("SELECT COUNT(*) AS total FROM books")->fetch_assoc()['total'];
 $totalOrders = $conn->query("SELECT COUNT(*) AS total FROM orders")->fetch_assoc()['total'];

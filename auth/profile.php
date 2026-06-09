@@ -1,7 +1,7 @@
 <?php
 include '../app.php';
 
-requireLogin();
+requireCustomer();
 
 $user_id = $_SESSION["user_id"];
 

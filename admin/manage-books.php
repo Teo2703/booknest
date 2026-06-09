@@ -1,5 +1,6 @@
 <?php
-include '../db.php';
+include '../app.php';
+requireAdmin();
 
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 

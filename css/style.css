@@ -424,26 +424,31 @@ th {
 /* Order Status */
 .status {
     border-radius: 999px;
-    padding: .3rem .6rem;
-    font-size: .82rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.82rem;
     font-weight: 800;
+    display: inline-block;
 }
 
-.pending {
+.status.pending {
     background: #fff0c2;
     color: #825b00;
 }
 
-.processing {
+.status.processing {
     background: #dfeeff;
     color: #2d5d8a;
 }
 
-.completed {
+.status.completed {
     background: #dff4e8;
     color: #216241;
 }
 
+.status.cancelled {
+    background: #fde2e2;
+    color: #c0392b;
+}
 /* Admin Layout */
 .admin-layout {
     display: grid;

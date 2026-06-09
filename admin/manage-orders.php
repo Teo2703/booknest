@@ -136,7 +136,7 @@ $orders = $stmt->get_result();
                                 <td><?php echo date("d M Y", strtotime($order['order_date'])); ?></td>
                                 <td>RM<?php echo number_format($order['total_amount'], 2); ?></td>
                                 <td>
-                                    <span class="status processing">
+                                    <span class="status <?php echo strtolower(trim($order['status'])); ?>">
                                         <?php echo htmlspecialchars($order['status']); ?>
                                     </span>
                                 </td>

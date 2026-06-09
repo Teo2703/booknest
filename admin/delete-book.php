@@ -1,5 +1,6 @@
 <?php
-include '../db.php';
+include '../app.php';
+requireAdmin();
 
 if (!isset($_GET['id'])) {
     die("Book ID is missing.");

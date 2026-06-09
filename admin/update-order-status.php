@@ -1,5 +1,6 @@
 <?php
 include '../app.php';
+requireAdmin();
 
 $order_id = $_POST['order_id'];
 $status = $_POST['status'];

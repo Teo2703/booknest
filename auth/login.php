@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=123">
 </head>
 <body>
 
@@ -91,7 +91,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <nav class="nav-links">
             <a href="../index.php">Home</a>
             <a href="../books/books.php">Books</a>
-            <a href="../group.html">Group</a>
             <a href="register.php">Register</a>
             <a class="active" href="login.php">Login</a>
         </nav>
@@ -144,8 +143,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </select>
             </div>
 
-            <button class="btn" type="submit">Login</button>
-            <a class="btn secondary" href="register.php">Create New Account</a>
+            <button class="btn login-btn" type="submit">Login</button>
+            <a class="btn secondary create-btn" href="register.php">Create New Account</a>
 
             <p class="small">
                 Sample customer: amanda@example.com / 123456<br>

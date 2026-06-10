@@ -24,7 +24,7 @@ if ($search != '') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Books | BookNest</title>
 
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=123">
 </head>
 
 <body>
@@ -78,8 +78,8 @@ if ($search != '') {
                 <!-- Action Area -->
                 <form method="GET" class="actions" style="margin-top:0;margin-bottom:1rem">
                     <a class="btn" href="#add-book">Add New Book</a>
-                    <input class="input" name="search" style="max-width:320px" placeholder="Search book record" value="<?php echo htmlspecialchars($search); ?>">
-                    <button class="btn secondary" type="submit">Search</button>
+                    <input class="input" name="search" style="max-width:530px" placeholder="Search book record" value="<?php echo htmlspecialchars($search); ?>">
+                    <button class="btn secondary search-btn" type="submit">Search</button>
                 </form>
 
                 <!-- Book Table -->
@@ -107,7 +107,7 @@ if ($search != '') {
                                 <td>RM<?php echo number_format($book['price'], 2); ?></td>
                                 <td><?php echo $book['stock']; ?></td>
                                 <td>
-                                    <a class="btn secondary" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
+                                    <a class="btn secondary edit-btn" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
                                     <a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>" onclick="return confirm('Delete this book?')">Delete</a>
                                 </td>
                             </tr>

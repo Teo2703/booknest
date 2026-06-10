@@ -42,7 +42,6 @@ $book = $result->fetch_assoc();
             <nav class="nav-links">
                 <a href="../index.php">Home</a>
                 <a class="active" href="books.php">Books</a>
-                <a href="../group.html">Group</a>
 
                 <?php if (!isLoggedIn()): ?>
                     <a href="../auth/register.php">Register</a>

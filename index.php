@@ -41,7 +41,6 @@ while ($row = $featured->fetch_assoc()) {
             <nav class="nav-links">
                 <a class="active" href="index.php">Home</a>
                 <a href="books/books.php">Books</a>
-                <a href="group.html">Group</a>
 
                 <?php if (!isLoggedIn()): ?>
                     <a href="auth/register.php">Register</a>

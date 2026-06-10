@@ -45,7 +45,7 @@ $books = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Books | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=123">
 </head>
 <body>
 
@@ -62,7 +62,6 @@ $books = $stmt->get_result();
             <nav class="nav-links">
                 <a href="../index.php">Home</a>
                 <a class="active" href="books.php">Books</a>
-                <a href="../group.html">Group</a>
 
                 <?php if (!isLoggedIn()): ?>
                     <a href="../auth/register.php">Register</a>
@@ -110,7 +109,7 @@ $books = $stmt->get_result();
                     <option value="price_low"  <?php if($sort=="price_low")  echo "selected"; ?>>Price: Low to High</option>
                     <option value="price_high" <?php if($sort=="price_high") echo "selected"; ?>>Price: High to Low</option>
                 </select>
-                <button class="btn secondary" type="submit">Search</button>
+                <button class="btn secondary searchbook-btn" type="submit">Search</button>
             </form>
 
             <div class="grid grid-3">
@@ -126,8 +125,8 @@ $books = $stmt->get_result();
                         <h3 class="book-title"><?php echo htmlspecialchars($book['title']); ?></h3>
                         <p class="meta">by <?php echo htmlspecialchars($book['author']); ?></p>
                         <p class="price">RM<?php echo number_format($book['price'], 2); ?></p>
-                        <div class="actions">
-                            <a class="btn secondary" href="book-detail.php?id=<?php echo $book['book_id']; ?>">View Details</a>
+                        <div class="actions1">
+                            <a class="btn secondary view-btn" href="book-detail.php?id=<?php echo $book['book_id']; ?>">View Details</a>
                             <?php if (isCustomer()): ?>
                                 <a class="btn" href="../orders/cart.php?add=<?php echo $book['book_id']; ?>">Add to Cart</a>
                             <?php elseif (!isLoggedIn()): ?>

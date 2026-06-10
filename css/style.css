@@ -101,12 +101,14 @@ a {
     align-items: center;
     justify-content: center;
     border: 0;
-    border-radius: 999px;
+    border-radius: 12px;
     padding: .75rem 1rem;
     background: var(--brand);
     color: #fff;
     font-weight: 700;
     cursor: pointer;
+    height: 50px;
+    font-size: 16px;
 }
 
 .btn:hover {
@@ -118,16 +120,41 @@ a {
     background: #ffffff;
     color: #6b4f3b;
     border: 1px solid #e0d5c8;
-    border-radius: 999px;
     padding: 0.4rem 1rem;
     transition: all 0.2s ease;
+    width: 70px;
+    font-size: 16px;
 }
 
-/* ✨ HOVER EFFECT */
 .btn.secondary:hover {
     background: #e6d5c3;
     color: #4a3426;
     transform: translateY(-1px);
+}
+
+.search-btn {
+    min-width: 120px;
+    height: 50px;
+}
+
+.searchbook-btn{
+    min-width: 1085px;
+    height: 40px;
+}
+
+.edit-btn {
+    height: 40px;
+}
+
+.view-btn, .cancel-btn {
+    min-width: 130px;
+}
+
+.login-btn, .create-btn, .register-btn, .already-btn{
+    margin-top: 15px;
+    min-width: 235px !important;
+    height: 40px !important;
+    font-size: 16px;
 }
 
 .update-form {
@@ -141,7 +168,7 @@ a {
 .update-btn {
     height: 46px;
     padding: 0 14px;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 0.85rem;
     font-weight: 600;
 }
@@ -163,6 +190,12 @@ a {
 .btn.danger {
     background: #e8b4b4;
     color: #7a1f1f;
+    border: 1px solid #e0d5c8;
+    border-radius: 12px;
+    padding: 0.4rem 1rem;
+    transition: all 0.2s ease;
+    width: 70px;
+    height: 40px;
 }
 
 .btn.danger:hover {
@@ -285,6 +318,14 @@ td .btn {
     box-shadow: var(--shadow);
 }
 
+.actions1 {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--paper);
+}
+
 .section {
     padding: 3rem 0;
 }
@@ -403,6 +444,18 @@ td .btn {
     grid-template-columns: 2fr 1fr 1fr;
     gap: .8rem;
     margin-bottom: 1.4rem;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.8rem;
+}
+
+/* Make button go to next row */
+.filters .searchbook-btn {
+    grid-column: 1 / -1;   /* full width */
+    justify-self: flex-end; /* align right */
 }
 
 .input,

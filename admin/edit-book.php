@@ -166,9 +166,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <textarea name="description" rows="4"><?php echo htmlspecialchars($book['description']); ?></textarea>
                 </div>
 
-                <div class="actions">
+                <div class="actions1">
                     <button class="btn" type="submit">Update Book</button>
-                    <a class="btn secondary" href="manage-books.php">Cancel</a>
+                    <a class="btn secondary cancel-btn" href="manage-books.php">Cancel</a>
                 </div>
             </form>
         </section>

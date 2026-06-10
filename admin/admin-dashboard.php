@@ -87,7 +87,7 @@ $recentOrders = $conn->query("
                 <!-- Recent Orders Header -->
                 <div class="section-head" style="margin-top: 2rem;">
                     <h2>Recent Orders</h2>
-                    <a class="btn secondary" href="manage-orders.php">View Orders</a>
+                    <a class="btn secondary view-btn" href="manage-orders.php">View Orders</a>
                 </div>
 
                 <!-- Recent Orders Table -->

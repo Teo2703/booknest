@@ -23,7 +23,7 @@ $recentOrders = $conn->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | BookNest</title>
 
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=123">
 </head>
 
 <body>
@@ -109,7 +109,7 @@ $recentOrders = $conn->query("
                             <td><?php echo htmlspecialchars($row['name']); ?></td>
                             <td>RM<?php echo number_format($row['total_amount'], 2); ?></td>
                             <td>
-                                <span class="status processing">
+                                <span class="status <?php echo strtolower(trim($row['status'])); ?>">
                                     <?php echo htmlspecialchars($row['status']); ?>
                                 </span>
                             </td>

@@ -189,6 +189,15 @@ ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`);
 COMMIT;
 
+-- Run this only if you already imported the old booknest.sql before.
+-- It adds checkout delivery/payment columns used by checkout.php.
+
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS delivery_name varchar(100) DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS delivery_contact varchar(20) DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS delivery_email varchar(100) DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS delivery_address text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS payment_method varchar(50) DEFAULT NULL;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

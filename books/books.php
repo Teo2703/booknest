@@ -126,11 +126,19 @@ $books = $stmt->get_result();
                         <p class="meta">by <?php echo htmlspecialchars($book['author']); ?></p>
                         <p class="price">RM<?php echo number_format($book['price'], 2); ?></p>
                         <div class="actions1">
-                            <a class="btn secondary view-btn" href="book-detail.php?id=<?php echo $book['book_id']; ?>">View Details</a>
+                            <a class="btn secondary view-btn" href="book-detail.php?id=<?php echo $book['book_id']; ?>">
+                                View Details
+                            </a>
+
                             <?php if (isCustomer()): ?>
-                                <a class="btn" href="../orders/cart.php?add=<?php echo $book['book_id']; ?>">Add to Cart</a>
+                                <a class="btn" href="../orders/cart.php?add=<?php echo $book['book_id']; ?>">
+                                    Add to Cart
+                                </a>
+
                             <?php elseif (!isLoggedIn()): ?>
-                                <a class="btn" href="../auth/login.php">Login to Buy</a>
+                                <a class="btn" href="../auth/login.php">
+                                    Login to Buy
+                                </a>
                             <?php endif; ?>
                         </div>
                     </div>

@@ -107,12 +107,17 @@ $book = $result->fetch_assoc();
 
                 <div class="actions">
                     <?php if (isCustomer() && $book['stock'] > 0): ?>
-                        <a class="btn" href="../orders/cart.php?add=<?php echo $book['book_id']; ?>">Add to Cart</a>
+                        <a class="btn" href="../orders/cart.php?add=<?php echo $book['book_id']; ?>">
+                            Add to Cart
+                        </a>
                     <?php elseif (!isLoggedIn()): ?>
-                        <a class="btn" href="../auth/login.php">Login to Buy</a>
+                        <a class="btn" href="../auth/login.php">
+                            Login to Buy
+                        </a>
                     <?php else: ?>
                         <button class="btn" disabled>Out of Stock</button>
                     <?php endif; ?>
+                    
                     <a class="btn secondary" href="books.php">Back to Books</a>
                 </div>
             </div>

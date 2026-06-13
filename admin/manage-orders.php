@@ -3,6 +3,9 @@ include '../app.php';
 requireAdmin();
 
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
+if ($statusFilter === '' && isset($_GET['status-select'])) {
+    $statusFilter = $_GET['status-select'];
+}
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 
 $sql = "
@@ -93,7 +96,7 @@ $orders = $stmt->get_result();
                 <a href="admin-dashboard.php">Dashboard</a>
                 <a href="manage-books.php">Manage Books</a>
                 <a class="active" href="manage-orders.php">Manage Orders</a>
-                <a href="../index.php">Logout</a>
+                <a href="../auth/logout.php">Logout</a>
             </aside>
 
             <!-- Manage Orders Content -->

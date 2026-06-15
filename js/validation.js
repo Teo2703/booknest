@@ -198,10 +198,10 @@ function setupCheckoutValidation() {
     const form = document.querySelector("#checkoutForm");
     if (!form) return;
 
-    const deliveryName = form.querySelector("[name='delivery_name']");
-    const deliveryContact = form.querySelector("[name='delivery_contact']");
-    const deliveryEmail = form.querySelector("[name='delivery_email']");
-    const deliveryAddress = form.querySelector("[name='delivery_address']");
+    const deliveryName = form.querySelector("[name='name']");
+    const deliveryContact = form.querySelector("[name='contact']");
+    const deliveryEmail = form.querySelector("[name='email']");
+    const deliveryAddress = form.querySelector("[name='address']");
     const paymentMethod = form.querySelector("[name='payment_method']");
 
     function validateDeliveryName() {
@@ -291,7 +291,7 @@ function setupCheckoutValidation() {
 
 /* Add/Edit book validation */
 function setupBookFormValidation() {
-    const form = document.querySelector("#bookForm");
+    const form = document.querySelector("#bookForm") || document.querySelector("#add-book") || document.querySelector("#edit-book");
     if (!form) return;
 
     const title = form.querySelector("[name='title']");

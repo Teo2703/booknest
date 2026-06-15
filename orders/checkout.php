@@ -232,7 +232,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <main class="section">
     <div class="container two-col">
-        <form class="form-card" method="POST" action="checkout.php">
+        <form id="checkoutForm" class="form-card" method="POST" action="checkout.php" novalidate>
             <h2>Delivery Information</h2>
 
             <?php if (!empty($errors)): ?>
@@ -273,6 +273,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="field">
                     <label>Payment Method</label>
                     <select name="payment_method">
+                        <option value="">Select payment method</option>
                         <option <?php if ($payment_method === 'Cash on Delivery') echo 'selected'; ?>>Cash on Delivery</option>
                         <option <?php if ($payment_method === 'Online Transfer') echo 'selected'; ?>>Online Transfer</option>
                     </select>
@@ -325,6 +326,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </footer>
-
+<script src="../js/validation.js"></script>
 </body>
 </html>

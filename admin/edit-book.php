@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </aside>
 
         <section>
-            <form class="form-card" method="POST">
+           <form id="edit-book" class="form-card" method="POST" novalidate>
                 <h2>Edit Book Form</h2>
 
                 <div class="form-grid">
@@ -175,6 +175,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     </div>
 </main>
-
+<script src="../js/validation.js"></script>
 </body>
 </html>

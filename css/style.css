@@ -732,16 +732,3 @@ th {
         font-size: 1.7rem;
     }
 }
-
-.input-error {
-    border-color: #b42318 !important;
-    background-color: #fff5f5;
-}
-
-.js-error {
-    display: block;
-    margin-top: 6px;
-    color: #b42318;
-    font-size: 13px;
-    font-weight: 600;
-}

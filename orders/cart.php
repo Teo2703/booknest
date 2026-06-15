@@ -75,11 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cart'])) {
             $error = "Some quantities were adjusted based on available stock.";
         }
 
-        if ($quantity <= 0) {
-            unset($_SESSION['cart'][$book_id]);
-        } else {
-            $_SESSION['cart'][$book_id] = $quantity;
-        }
+        $_SESSION['cart'][$book_id] = $quantity;
     }
 
     if ($error === '') {
@@ -95,7 +91,12 @@ if (!empty($_SESSION['cart'])) {
     $placeholders = implode(',', array_fill(0, count($bookIds), '?'));
     $types = str_repeat('i', count($bookIds));
 
-    $stmt = $conn->prepare("SELECT book_id, title, author, category, price, stock FROM books WHERE book_id IN ($placeholders)");
+    $stmt = $conn->prepare("
+        SELECT book_id, title, author, category, price, stock 
+        FROM books 
+        WHERE book_id IN ($placeholders)
+    ");
+
     $stmt->bind_param($types, ...$bookIds);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -105,6 +106,7 @@ if (!empty($_SESSION['cart'])) {
         $quantity = isset($_SESSION['cart'][$book_id]) ? (int)$_SESSION['cart'][$book_id] : 0;
 
         if ($quantity < 1) {
+            unset($_SESSION['cart'][$book_id]);
             continue;
         }
 
@@ -139,8 +141,157 @@ $total = $subtotal + $delivery;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css?v=123">
+    <link rel="stylesheet" href="../css/style.css?v=130">
+
+    <style>
+        .cart-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 330px;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .cart-panel {
+            background: #fffdf8;
+            border: 1px solid #e7d8c8;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .cart-header,
+        .cart-row {
+            display: grid;
+            grid-template-columns: minmax(180px, 2fr) minmax(90px, 1fr) minmax(90px, 1fr) minmax(100px, 1fr);
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .cart-header {
+            padding: 1rem 1.4rem;
+            background: #fff8ef;
+            border-bottom: 1px solid #e7d8c8;
+            font-weight: 800;
+            color: #5b321c;
+            font-size: 1.05rem;
+        }
+
+        .cart-row {
+            padding: 1.2rem 1.4rem;
+            border-bottom: 1px solid #e7d8c8;
+        }
+
+        .cart-row:last-child {
+            border-bottom: none;
+        }
+
+        .cart-book-title {
+            font-weight: 800;
+            color: #222;
+            margin-bottom: 0.3rem;
+        }
+
+        .cart-book-meta {
+            color: #6d5f55;
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .cart-remove-link {
+            display: inline-block;
+            color: #8b1e1e;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .cart-remove-link:hover {
+            text-decoration: underline;
+        }
+
+        .cart-price,
+        .cart-subtotal {
+            font-weight: 700;
+            color: #222;
+        }
+
+        .cart-qty-input {
+            width: 76px;
+            height: 44px;
+            padding: 0.4rem;
+            text-align: center;
+        }
+
+        .cart-actions {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.6rem;
+            padding: 1rem 1.4rem;
+            border-top: 1px solid #e7d8c8;
+            background: #fffdf8;
+        }
+
+        .cart-actions .btn {
+            width: 100%;
+            min-width: 0;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-align: center;
+            box-sizing: border-box;
+            white-space: normal;
+            line-height: 1.2;
+        }
+
+        .cart-actions button.btn {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        @media (max-width: 1000px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .cart-header {
+                display: none;
+            }
+
+            .cart-row {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+
+            .cart-price::before {
+                content: "Price: ";
+                font-weight: 800;
+                color: #5b321c;
+            }
+
+            .cart-subtotal::before {
+                content: "Subtotal: ";
+                font-weight: 800;
+                color: #5b321c;
+            }
+
+            .cart-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-qty-input {
+                width: 100%;
+                max-width: 120px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
 <div class="topbar">
@@ -153,12 +304,15 @@ $total = $subtotal + $delivery;
 <header class="navbar">
     <div class="container nav-inner">
         <a class="brand" href="../index.php">Book<span>Nest</span></a>
+
         <nav class="nav-links">
             <a href="../index.php">Home</a>
             <a href="../books/books.php">Books</a>
             <a class="active" href="cart.php">Cart</a>
             <a href="order-history.php">Orders</a>
-            <a href="../auth/logout.php">👤 <?php echo htmlspecialchars($_SESSION['user_name']); ?> | Logout</a>
+            <a href="../auth/logout.php">
+                👤 <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Customer'); ?> | Logout
+            </a>
         </nav>
     </div>
 </header>
@@ -172,102 +326,159 @@ $total = $subtotal + $delivery;
 </section>
 
 <main class="section">
+
     <div class="container">
         <?php if ($message !== ''): ?>
-            <div class="notice" style="margin-bottom:1rem;"><?php echo htmlspecialchars($message); ?></div>
+            <div class="notice" style="margin-bottom:1rem;">
+                <?php echo htmlspecialchars($message); ?>
+            </div>
         <?php endif; ?>
 
         <?php if ($error !== ''): ?>
-            <div class="notice" style="margin-bottom:1rem;"><?php echo htmlspecialchars($error); ?></div>
+            <div class="notice" style="margin-bottom:1rem;">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
         <?php endif; ?>
     </div>
 
-    <div class="container two-col">
-        <div class="table-wrap">
+    <div class="container cart-layout">
+
+        <div class="cart-panel">
             <?php if (empty($cartItems)): ?>
-                <div class="notice">
+
+                <div class="notice" style="margin:1rem;">
                     Your shopping cart is empty. Please browse books and add items to cart.
                 </div>
-            <?php else: ?>
-                <form method="POST" action="cart.php">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Book</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Subtotal</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($cartItems as $item): ?>
-                                <?php
-                                    $book = $item['book'];
-                                    $bookId = (int)$book['book_id'];
-                                ?>
-                                <tr>
-                                    <td>
-                                        <strong><?php echo htmlspecialchars($book['title']); ?></strong><br>
-                                        <span class="small">
-                                            <?php echo htmlspecialchars($book['category']); ?> | Stock: <?php echo (int)$book['stock']; ?>
-                                        </span>
-                                    </td>
-                                    <td>RM<?php echo number_format($book['price'], 2); ?></td>
-                                    <td>
-                                        <input class="input" style="width:90px;" type="number" name="quantity[<?php echo $bookId; ?>]" value="<?php echo (int)$item['quantity']; ?>" min="1" max="<?php echo (int)$book['stock']; ?>">
-                                    </td>
-                                    <td>RM<?php echo number_format($item['line_total'], 2); ?></td>
-                                    <td>
-                                        <a class="btn danger" href="cart.php?remove=<?php echo $bookId; ?>">Remove</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
 
-                    <div class="actions" style="margin-top:1rem; justify-content:flex-end;">
-                        <a class="btn secondary" style="width:auto;" href="../books/books.php">Continue Shopping</a>
-                        <a class="btn danger" style="width:auto;" href="cart.php?clear=1">Clear Cart</a>
-                        <button class="btn" type="submit" name="update_cart">Update Cart</button>
+            <?php else: ?>
+
+                <form method="POST" action="cart.php">
+
+                    <div class="cart-header">
+                        <div>Book</div>
+                        <div>Price</div>
+                        <div>Quantity</div>
+                        <div>Subtotal</div>
                     </div>
+
+                    <?php foreach ($cartItems as $item): ?>
+                        <?php
+                            $book = $item['book'];
+                            $bookId = (int)$book['book_id'];
+                        ?>
+
+                        <div class="cart-row">
+                            <div>
+                                <div class="cart-book-title">
+                                    <?php echo htmlspecialchars($book['title']); ?>
+                                </div>
+
+                                <div class="cart-book-meta">
+                                    <?php echo htmlspecialchars($book['category']); ?>
+                                    |
+                                    Stock: <?php echo (int)$book['stock']; ?>
+                                </div>
+
+                                <a class="cart-remove-link" href="cart.php?remove=<?php echo $bookId; ?>">
+                                    Remove
+                                </a>
+                            </div>
+
+                            <div class="cart-price">
+                                RM<?php echo number_format($book['price'], 2); ?>
+                            </div>
+
+                            <div>
+                                <input 
+                                    class="input cart-qty-input"
+                                    type="number"
+                                    name="quantity[<?php echo $bookId; ?>]"
+                                    value="<?php echo (int)$item['quantity']; ?>"
+                                    min="1"
+                                    max="<?php echo (int)$book['stock']; ?>"
+                                >
+                            </div>
+
+                            <div class="cart-subtotal">
+                                RM<?php echo number_format($item['line_total'], 2); ?>
+                            </div>
+                        </div>
+
+                    <?php endforeach; ?>
+
+                    <div class="cart-actions">
+                        <a class="btn secondary" href="../books/books.php">
+                            Continue Shopping
+                        </a>
+
+                        <a class="btn danger" href="cart.php?clear=1">
+                            Clear Cart
+                        </a>
+
+                        <button class="btn" type="submit" name="update_cart">
+                            Update Cart
+                        </button>
+                    </div>
+
                 </form>
+
             <?php endif; ?>
         </div>
 
         <aside class="summary">
             <h2>Order Summary</h2>
-            <div class="summary-row"><span>Subtotal</span><strong>RM<?php echo number_format($subtotal, 2); ?></strong></div>
-            <div class="summary-row"><span>Delivery</span><strong>RM<?php echo number_format($delivery, 2); ?></strong></div>
-            <div class="summary-row total"><span>Total</span><span>RM<?php echo number_format($total, 2); ?></span></div>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong>RM<?php echo number_format($subtotal, 2); ?></strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Delivery</span>
+                <strong>RM<?php echo number_format($delivery, 2); ?></strong>
+            </div>
+
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>RM<?php echo number_format($total, 2); ?></span>
+            </div>
 
             <?php if (!empty($cartItems)): ?>
-                <a class="btn" style="width:100%;margin-top:1rem" href="checkout.php">Proceed to Checkout</a>
+                <a class="btn" style="width:100%;margin-top:1rem" href="checkout.php">
+                    Proceed to Checkout
+                </a>
             <?php else: ?>
-                <a class="btn" style="width:100%;margin-top:1rem" href="../books/books.php">Browse Books</a>
+                <a class="btn" style="width:100%;margin-top:1rem" href="../books/books.php">
+                    Browse Books
+                </a>
             <?php endif; ?>
         </aside>
+
     </div>
 </main>
 
 <footer class="footer">
     <div class="container footer-grid">
+
         <div>
             <h3>BookNest</h3>
             <p>Mini Online Bookstore e-commerce system.</p>
         </div>
+
         <div>
             <h4>Customer</h4>
             <a href="../books/books.php">Browse Books</a>
             <a href="cart.php">Shopping Cart</a>
             <a href="checkout.php">Checkout</a>
         </div>
+
         <div>
             <h4>Admin</h4>
             <a href="../admin/admin-dashboard.php">Dashboard</a>
             <a href="../admin/manage-books.php">Manage Books</a>
             <a href="../admin/manage-orders.php">Manage Orders</a>
         </div>
+
     </div>
 </footer>
 

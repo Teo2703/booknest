@@ -118,7 +118,7 @@ $book = $result->fetch_assoc();
                         <button class="btn" disabled>Out of Stock</button>
                     <?php endif; ?>
                     
-                    <a class="btn secondary" href="books.php">Back to Books</a>
+                    <a class="btn secondary" href="books.php">Back</a>
                 </div>
             </div>
 

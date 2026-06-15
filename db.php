@@ -1,21 +1,28 @@
 <?php
-$host = "localhost";
+mysqli_report(MYSQLI_REPORT_OFF);
+
+$host = "127.0.0.1";
 $user = "root";
 $password = "";
 $database = "booknest";
 
-// Try default port (3306)
-$conn = @new mysqli($host, $user, $password, $database);
+$ports = [3306, 3307];
+$conn = null;
+$lastError = "";
 
-// If failed, try 3307 (for your friend)
-if ($conn->connect_error) {
-    $conn = new mysqli($host, $user, $password, $database, 3307);
+foreach ($ports as $port) {
+    $conn = @new mysqli($host, $user, $password, $database, $port);
+
+    if (!$conn->connect_error) {
+        $conn->set_charset("utf8mb4");
+        break;
+    }
+
+    $lastError = $conn->connect_error;
+    $conn = null;
 }
 
-// If still fail → show error
-if ($conn->connect_error) {
-    die("Database connection failed: " . $conn->connect_error);
+if ($conn === null) {
+    die("Database connection failed. Please check MySQL is running, database name is 'booknest', and port is 3306 or 3307. Error: " . $lastError);
 }
-
-$conn->set_charset("utf8mb4");
 ?>

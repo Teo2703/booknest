@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <main class="section">
     <div class="container auth">
-        <form class="form-card" method="POST" action="login.php">
+        <form id="loginForm" class="form-card" method="POST" action="login.php" novalidate>
             <h2>Login to BookNest</h2>
 
             <?php if (isset($_SESSION["success"])): ?>
@@ -174,6 +174,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </div>
 </footer>
-
+<script src="../js/validation.js"></script>
 </body>
 </html>

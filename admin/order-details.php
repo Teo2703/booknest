@@ -35,7 +35,7 @@ $items = $stmt2->get_result();
 <html>
 <head>
     <title>Order Details</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=123">
 </head>
 
 <body>
@@ -78,7 +78,7 @@ $items = $stmt2->get_result();
 </table>
 </div>
 
-<a href="manage-orders.php" class="btn">⬅ Back</a>
+<a href="manage-orders.php" class="btn back-btn">⬅ Back</a>
 
 </div>
 

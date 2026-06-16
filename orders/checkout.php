@@ -159,6 +159,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
             $order_id = $conn->insert_id;
 
+            $historyStmt = $conn->prepare("
+                INSERT INTO order_status_history (order_id, status, changed_by_user_id, note)
+                VALUES (?, ?, ?, ?)
+            ");
+
+            $initialStatus = 'Pending';
+            $customerId = (int)$_SESSION['user_id'];
+            $historyNote = 'Order placed by customer';
+
+            $historyStmt->bind_param("isis", $order_id, $initialStatus, $customerId, $historyNote);
+            $historyStmt->execute();
+
             $itemStmt = $conn->prepare("INSERT INTO order_items (order_id, book_id, quantity, price) VALUES (?, ?, ?, ?)");
             $stockStmt = $conn->prepare("UPDATE books SET stock = stock - ? WHERE book_id = ? AND stock >= ?");
 

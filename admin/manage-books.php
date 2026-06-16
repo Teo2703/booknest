@@ -37,7 +37,7 @@ while ($row = $lowStockQuery->fetch_assoc()) {
 <head>
 <meta charset="UTF-8">
 <title>Manage Books | BookNest</title>
-<link rel="stylesheet" href="../css/style.css?v=123">
+<link rel="stylesheet" href="../css/style.css?v=124">
 </head>
 
 <body>
@@ -76,13 +76,22 @@ while ($row = $lowStockQuery->fetch_assoc()) {
 
 <section>
 
-<!-- SEARCH -->
-<form method="GET" class="actions">
-    <input class="input" name="search" placeholder="Search book" value="<?php echo htmlspecialchars($search); ?>">
-    <button class="btn secondary">Search</button>
+<!-- SEARCH + ADD BOOK SHORTCUT -->
+<form method="GET" class="actions" style="margin-top:0;margin-bottom:1rem">
+    <a class="btn" href="#add-book">Add New Book</a>
+
+    <input 
+        class="input" 
+        name="search" 
+        style="max-width:530px" 
+        placeholder="Search book" 
+        value="<?php echo htmlspecialchars($search); ?>"
+    >
+
+    <button class="btn secondary search-btn" type="submit">Search</button>
 </form>
 
-<!-- 🔥 LOW STOCK WARNING -->
+<!-- LOW STOCK WARNING -->
 <?php if (!empty($lowStockBooks)): ?>
 <div class="low-stock-card">
     <h3>⚠ Low Stock Warning</h3>
@@ -125,7 +134,7 @@ while ($row = $lowStockQuery->fetch_assoc()) {
 <td><?php echo htmlspecialchars($book['category']); ?></td>
 <td>RM<?php echo number_format($book['price'], 2); ?></td>
 
-<!-- 🔥 STOCK COLOR -->
+<!-- STOCK COLOR -->
 <td>
 <span class="
 <?php 
@@ -137,8 +146,12 @@ elseif ($book['stock'] <= 5) echo 'stock-warning';
 </td>
 
 <td>
-<a class="btn secondary" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
-<a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>">Delete</a>
+<a class="btn secondary edit-btn" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
+<a 
+    class="btn danger" 
+    href="delete-book.php?id=<?php echo $book['book_id']; ?>" 
+    onclick="return confirm('Delete this book?')"
+>Delete</a>
 </td>
 </tr>
 <?php endwhile; ?>
@@ -146,9 +159,68 @@ elseif ($book['stock'] <= 5) echo 'stock-warning';
 </table>
 </div>
 
+<!-- ADD BOOK FORM -->
+<form 
+    id="add-book" 
+    class="form-card" 
+    style="margin-top:1.4rem" 
+    method="POST" 
+    action="add-book.php" 
+    enctype="multipart/form-data" 
+    novalidate
+>
+    <h2>Add Book Form</h2>
+
+    <div class="form-grid">
+        <div class="field">
+            <label>Title</label>
+            <input class="input" name="title" placeholder="Book title" required>
+        </div>
+
+        <div class="field">
+            <label>Author</label>
+            <input class="input" name="author" placeholder="Author name" required>
+        </div>
+
+        <div class="field">
+            <label>Category</label>
+            <select name="category" required>
+                <option value="Fiction">Fiction</option>
+                <option value="Academic">Academic</option>
+                <option value="Children">Children</option>
+                <option value="Self-Improvement">Self-Improvement</option>
+                <option value="Comics">Comics</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Price</label>
+            <input class="input" name="price" type="number" step="0.01" min="0" placeholder="RM" required>
+        </div>
+
+        <div class="field">
+            <label>Stock</label>
+            <input class="input" name="stock" type="number" min="0" placeholder="Quantity" required>
+        </div>
+
+        <div class="field">
+            <label>Book Image</label>
+            <input class="input" name="image" type="file" accept="image/*">
+        </div>
+    </div>
+
+    <div class="field">
+        <label>Description</label>
+        <textarea name="description" rows="4" placeholder="Book description"></textarea>
+    </div>
+
+    <button class="btn" type="submit">Save Book</button>
+</form>
+
 </section>
 </div>
 </main>
 
+<script src="../js/validation.js"></script>
 </body>
 </html>

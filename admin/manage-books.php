@@ -91,15 +91,15 @@ $lowStockCount = count($lowStockBooks);
     <button class="btn secondary search-btn" type="submit">Search</button>
 </form>
 
-<<<<<<< HEAD
 <!-- 🔥 LOW STOCK STAT CARD -->
 <div class="stat-grid">
     <div class="stat danger-card">
         <span>⚠ Low Stock</span><br>
         <strong><?php echo $lowStockCount; ?> Items</strong>
     </div>
-=======
-<!-- LOW STOCK WARNING -->
+</div>
+
+<!-- 🔥 LOW STOCK WARNING -->
 <?php if (!empty($lowStockBooks)): ?>
 <div class="low-stock-card">
     <h3>⚠ Low Stock Warning</h3>
@@ -115,8 +115,8 @@ $lowStockCount = count($lowStockBooks);
         </div>
     <?php endforeach; ?>
 
->>>>>>> fc8c952bb0cb8f77de5c6c1f4b6070b1abc52470
 </div>
+<?php endif; ?>
 
 <!-- TABLE -->
 <div class="table-wrap">

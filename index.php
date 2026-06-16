@@ -35,33 +35,7 @@ while ($row = $featured->fetch_assoc()) {
         </div>
     </div>
 
-    <header class="navbar">
-        <div class="container nav-inner">
-            <a class="brand" href="index.php">Book<span>Nest</span></a>
-            <nav class="nav-links">
-                <a class="active" href="index.php">Home</a>
-                <a href="books/books.php">Books</a>
-
-                <?php if (!isLoggedIn()): ?>
-                    <a href="auth/register.php">Register</a>
-                    <a href="auth/login.php">Login</a>
-
-                <?php elseif (isAdmin()): ?>
-                    <a href="admin/admin-dashboard.php">Dashboard</a>
-                    <a href="auth/logout.php">Logout</a>
-
-                <?php else: ?>
-                    <a href="orders/cart.php">Cart</a>
-                    <a href="orders/order-history.php">Orders</a>
-                     <a href="auth/profile.php">Profile</a>
-                    <a href="auth/logout.php">
-                        👤 <?php echo htmlspecialchars($_SESSION['user_name']); ?> | Logout
-                    </a>
-
-                <?php endif; ?>
-            </nav>
-        </div>
-    </header>
+    <?php include __DIR__ . '/includes/navigation.php'; ?>
 
     <section class="hero">
         <div class="container hero-grid">

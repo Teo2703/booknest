@@ -66,7 +66,7 @@ while ($row = $featured->fetch_assoc()) {
                     <h2>Featured Books</h2>
                     <p>Most popular books in our store.</p>
                 </div>
-                <a class="btn secondary" href="books/books.php">View All</a>
+                <a class="btn secondary view-btn" href="books/books.php">View All</a>
             </div>
             <div class="grid grid-3">
                 <?php if (empty($featuredBooks)): ?>

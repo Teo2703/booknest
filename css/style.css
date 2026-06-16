@@ -389,8 +389,6 @@ td .btn {
     align-items: center;
     justify-content: space-between;
     background: var(--paper);
-    margin-bottom: 1.5rem !important;
-    padding: 1rem 0rem;
 }
 
 .section {

@@ -89,7 +89,7 @@ $book = $result->fetch_assoc();
                     </div>
                 </div>
 
-                <div class="actions">
+                <div class="actions1">
                     <?php if (isCustomer() && $book['stock'] > 0): ?>
                         <a class="btn" href="../orders/cart.php?add=<?php echo $book['book_id']; ?>">
                             Add to Cart

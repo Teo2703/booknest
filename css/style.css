@@ -122,7 +122,6 @@ a {
     border: 1px solid #e0d5c8;
     padding: 0.4rem 1rem;
     transition: all 0.2s ease;
-    width: 70px;
     font-size: 16px;
 }
 
@@ -189,6 +188,10 @@ a {
     gap: 10px;
 }
 
+.filter-btn{
+    min-width: 100px;
+}
+
 /* SAME SIZE */
 .status-select,
 .update-btn {
@@ -201,7 +204,7 @@ a {
 
 /* Fix select width */
 .status-select {
-    width: 150px;   /* control size */
+    width: 400px;   /* control size */
     border: 1px solid #ddd;
     background: #f9f9f9;
 }
@@ -225,6 +228,21 @@ a {
 
 .logout-btn {
     height: 50px;
+}
+
+.export-btn {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    background: #27ae60;
+    font-size: 15px;
+    height: 50px;
+}
+
+.export-btn:hover {
+    background: #219150;
 }
 
 .delete-btn {
@@ -531,14 +549,14 @@ td .btn {
     border-radius: var(--radius);
     padding: 1rem;
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr auto auto;
     gap: .8rem;
     margin-bottom: 1.4rem;
 }
 
 .filters {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr auto 1fr;
     gap: 0.8rem;
 }
 
@@ -551,13 +569,22 @@ td .btn {
 .input,
 select,
 textarea {
-    width: 100%;
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: .78rem .9rem;
     background: #fff;
     font: inherit;
     color: var(--ink);
+}
+
+.filters input[type="date"] {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    font-size: 14px;
+    background: #fff;
+    height: 50px;
+    width: 100%;
 }
 
 .detail-cover {

@@ -99,8 +99,10 @@ $orders = $stmt->get_result();
             <section>
 
                 <!-- Search and Filter Area -->
-                <form method="GET" class="filters" style="grid-template-columns:2fr 1fr auto">
+                <form method="GET" class="filters" style="grid-template-columns:2fr auto auto">
                     <input class="input" name="search" placeholder="Search by order ID or customer" value="<?php echo htmlspecialchars($search); ?>">
+                    <input type="date" name="from_date">
+                    <input type="date" name="to_date">
 
                     <select name="status-select">
                         <option>All Status</option>
@@ -110,7 +112,15 @@ $orders = $stmt->get_result();
                         <option <?php if($statusFilter=="Cancelled") echo "selected"; ?>>Cancelled</option>
                     </select>
 
-                    <button class="btn secondary" type="submit">Filter</button>
+                    <button class="btn secondary filter-btn" type="submit">Filter</button>
+                    <a href="export-orders.php?
+                    search=<?php echo urlencode($search); ?>
+                    &status=<?php echo urlencode($statusFilter); ?>
+                    &from=<?php echo $_GET['from_date'] ?? ''; ?>
+                    &to=<?php echo $_GET['to_date'] ?? ''; ?>"
+                    class="btn export-btn">
+                    ⬇ Export CSV
+                    </a>
                 </form>
 
                 <!-- Orders Table -->

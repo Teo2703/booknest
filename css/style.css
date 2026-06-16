@@ -1128,8 +1128,26 @@ canvas {
 .row-warning { background: #fffaf0; }
 .row-danger { background: #fff5f5; }
 
-.divider {
-    margin: 1.5rem 0;
-    border: none;
-    border-top: 1px solid #ddd;
+.trend {
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+
+/* GREEN */
+.trend.up {
+    color: #2e7d32;
+    background: #e8f5e9;
+}
+
+/* RED */
+.trend.down {
+    color: #c0392b;
+    background: #fde2e2;
+}
+
+/* YELLOW */
+.trend.stable {
+    color: #856404;
+    background: #fff3cd;
 }

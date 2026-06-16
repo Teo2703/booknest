@@ -8,7 +8,7 @@ requireAdmin();
 $range = isset($_GET['range']) ? (int)$_GET['range'] : 7;
 
 /* ======================
-   SALES DATA (LINE CHART)
+   SALES DATA
 ====================== */
 $salesQuery = $conn->query("
     SELECT DATE(order_date) as date, SUM(total_amount) as total
@@ -27,28 +27,40 @@ while ($row = $salesQuery->fetch_assoc()) {
     $totals[] = (float)$row['total'];
 }
 
+/* ======================
+   ANALYTICS CALCULATION
+====================== */
+$bestDay = "No Data";
+$worstDay = "No Data";
+$maxSales = 0;
+$minSales = 0;
+$avgSales = 0;
+$trend = "no";
+
 if (!empty($totals)) {
 
     $maxSales = max($totals);
     $minSales = min($totals);
 
-    $bestDay = $dates[array_search($maxSales, $totals)];
-    $worstDay = $dates[array_search($minSales, $totals)];
+    $bestDay = date("d M", strtotime($dates[array_search($maxSales, $totals)]));
+    $worstDay = date("d M", strtotime($dates[array_search($minSales, $totals)]));
 
     $avgSales = array_sum($totals) / count($totals);
 
-    $trend = "Stable";
+    // TREND LOGIC 🔥
     if (count($totals) >= 2) {
         if (end($totals) > $totals[0]) {
-            $trend = "Increasing 📈";
+            $trend = "up";
         } elseif (end($totals) < $totals[0]) {
-            $trend = "Decreasing 📉";
+            $trend = "down";
+        } else {
+            $trend = "stable";
         }
     }
 }
 
 /* ======================
-   ORDER COUNT (BAR CHART)
+   ORDER COUNT
 ====================== */
 $orderQuery = $conn->query("
     SELECT DATE(order_date) as date, COUNT(*) as total_orders
@@ -70,54 +82,7 @@ while ($row = $orderQuery->fetch_assoc()) {
 ====================== */
 $totalRevenue = array_sum($totals);
 $totalOrdersCount = array_sum($orderCounts);
-
-/* ======================
-   SALES ANALYSIS
-====================== */
-
-$bestDay = "N/A";
-$worstDay = "N/A";
-$maxSales = 0;
-$minSales = PHP_INT_MAX;
-$totalSales = 0;
-$countDays = 0;
-
-/* get sales data */
-$salesQuery = $conn->query("
-    SELECT DATE(order_date) as date, SUM(total_amount) as total
-    FROM orders
-    WHERE status = 'Completed'
-    GROUP BY DATE(order_date)
-");
-
-while ($row = $salesQuery->fetch_assoc()) {
-
-    $date = $row['date'];
-    $total = $row['total'];
-
-    $totalSales += $total;
-    $countDays++;
-
-    /* best day */
-    if ($total > $maxSales) {
-        $maxSales = $total;
-        $bestDay = date("d M", strtotime($date));
-    }
-
-    /* worst day */
-    if ($total < $minSales) {
-        $minSales = $total;
-        $worstDay = date("d M", strtotime($date));
-    }
-}
-
-/* average */
-$avgSales = ($countDays > 0) ? $totalSales / $countDays : 0;
-
-/* trend */
-$trend = ($countDays > 1 && $maxSales > $minSales) ? "Upward 📈" : "Stable";
 ?>
-
 
 
 <!DOCTYPE html>
@@ -203,7 +168,16 @@ $trend = ($countDays > 1 && $maxSales > $minSales) ? "Upward 📈" : "Stable";
 
     <p>📊 Average Sales: RM<?php echo number_format($avgSales,2); ?></p>
 
-    <p>📈 Trend: <?php echo $trend; ?></p>
+    <p>📈 Trend: 
+    <span class="trend <?php echo $trend; ?>">
+    <?php 
+    if ($trend == "up") echo "📈 ↑ Increasing";
+    elseif ($trend == "down") echo "📉 ↓ Decreasing";
+    elseif ($trend == "stable") echo "➡ Stable";
+    else echo "No Data";
+    ?>
+    </span>
+    </p>
 </div>
 
 <!-- SALES CHART -->

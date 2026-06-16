@@ -123,7 +123,7 @@ $orders = $stmt->get_result();
                                 <th>Date</th>
                                 <th>Total</th>
                                 <th>Status</th>
-                                <th>Update</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
 
@@ -139,7 +139,12 @@ $orders = $stmt->get_result();
                                         <?php echo htmlspecialchars($order['status']); ?>
                                     </span>
                                 </td>
-                                <td>
+                                <td class="action-cell">
+
+                                    <a class="btn view1-btn" href="order-details.php?id=<?php echo $order['order_id']; ?>">
+                                        View
+                                    </a>
+
                                     <form method="POST" action="update-order-status.php" class="update-form">
                                         <input type="hidden" name="order_id" value="<?php echo $order['order_id']; ?>">
 
@@ -152,6 +157,7 @@ $orders = $stmt->get_result();
 
                                         <button class="btn secondary update-btn" type="submit">Update</button>
                                     </form>
+
                                 </td>
                             </tr>
                             <?php endwhile; ?>

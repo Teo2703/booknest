@@ -365,10 +365,16 @@ td .btn {
 /* Cards */
 .card {
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .card-body {
     padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .book-cover {
@@ -422,14 +428,36 @@ td .btn {
 
 .book-title {
     font-weight: 800;
-    margin: 0 0 .25rem;
+    margin: 0.45rem 0 0.25rem;
+    line-height: 1.35;
+    min-height: 62px;
+
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-body .meta {
+    min-height: 34px;
+    margin: 0.35rem 0 0.5rem;
 }
 
 .price {
     color: var(--brand-dark);
     font-size: 1.15rem;
     font-weight: 800;
-    margin: .65rem 0;
+    margin: 0.65rem 0 1rem;
+}
+
+.actions1 {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--paper);
+    margin-top: auto;
 }
 
 .tag {

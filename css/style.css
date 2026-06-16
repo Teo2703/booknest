@@ -122,7 +122,7 @@ a {
     border: 1px solid #e0d5c8;
     padding: 0.4rem 1rem;
     transition: all 0.2s ease;
-    width: 70px;
+    width: 50px;
     font-size: 16px;
 }
 
@@ -194,7 +194,7 @@ a {
     border-radius: 12px;
     padding: 0.4rem 1rem;
     transition: all 0.2s ease;
-    width: 70px;
+    width: 30px;
     height: 40px;
 }
 
@@ -276,6 +276,7 @@ td .btn {
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
+    margin-top: 1rem;
 }
 
 .hero-card {
@@ -307,6 +308,7 @@ td .btn {
 
 /* General Layout */
 .actions {
+    margin-bottom: 1.5rem !important;
     display: flex;
     gap: 0.8rem;
     align-items: center;
@@ -613,6 +615,7 @@ th {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .stat {
@@ -806,22 +809,83 @@ canvas {
     color: red;
 }
 
-/* LOW STOCK CARD */
 .low-stock-card {
-    background: #fff5f5;
+    background: linear-gradient(135deg, #fff5f5, #ffeaea);
+    border: 1px solid #f5c2c7;
     border-left: 6px solid #e74c3c;
-    padding: 1rem;
-    border-radius: 12px;
-    margin-bottom: 1rem;
+    padding: 1.2rem;
+    border-radius: 16px;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+}
+
+/* HEADER */
+.low-stock-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.low-stock-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.low-stock-header .count {
+    margin-left: auto;
+    background: #e74c3c;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
+/* SUBTEXT */
+.low-stock-sub {
+    font-size: 0.85rem;
+    color: #a94442;
+    margin: 0.4rem 0 0.8rem;
+}
+
+/* LIST */
+.low-stock-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .low-stock-item {
     display: flex;
     justify-content: space-between;
-    padding: 0.5rem;
+    align-items: center;
     background: white;
-    margin-top: 5px;
-    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+}
+
+/* STOCK LINE */
+.stock-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+/* DOT */
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* COLORS */
+.stock-line.warning .dot {
+    background: #f1c40f;
+}
+
+.stock-line.danger .dot {
+    background: #e74c3c;
 }
 
 /* BADGE */
@@ -841,11 +905,75 @@ canvas {
 
 /* TABLE STOCK COLOR */
 .stock-warning {
-    color: orange;
+    color: #d68910;
     font-weight: bold;
 }
 
 .stock-danger {
-    color: red;
+    color: #c0392b;
     font-weight: bold;
 }
+
+
+/* STAT CARD */
+.danger-card {
+    background: #fff5f5;
+    border: 1px solid #f5c2c7;
+}
+.danger-card strong {
+    color: #c0392b;
+}
+
+/* LOW STOCK CARD */
+.low-stock-card {
+    background: linear-gradient(135deg, #fff5f5, #ffeaea);
+    border-left: 6px solid #e74c3c;
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+}
+
+/* HEADER */
+.low-stock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* COUNT BADGE */
+.count {
+    background: #e74c3c;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+/* LIST */
+.low-stock-item {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+/* STOCK LINE */
+.stock-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+/* DOT */
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.stock-line.normal .dot { background: #2ecc71; }
+.stock-line.warning .dot { background: #f1c40f; }
+.stock-line.danger .dot { background: #e74c3c; }
+
+/* ROW */
+.row-warning { background: #fffaf0; }
+.row-danger { background: #fff5f5; }

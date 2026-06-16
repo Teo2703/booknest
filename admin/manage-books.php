@@ -16,9 +16,7 @@ if ($search != '') {
     $books = $conn->query("SELECT * FROM books ORDER BY book_id ASC");
 }
 
-/* ======================
-   LOW STOCK QUERY
-====================== */
+/* LOW STOCK */
 $lowStockQuery = $conn->query("
     SELECT title, stock 
     FROM books 
@@ -30,6 +28,8 @@ $lowStockBooks = [];
 while ($row = $lowStockQuery->fetch_assoc()) {
     $lowStockBooks[] = $row;
 }
+
+$lowStockCount = count($lowStockBooks);
 ?>
 
 <!DOCTYPE html>
@@ -82,24 +82,13 @@ while ($row = $lowStockQuery->fetch_assoc()) {
     <button class="btn secondary">Search</button>
 </form>
 
-<!-- 🔥 LOW STOCK WARNING -->
-<?php if (!empty($lowStockBooks)): ?>
-<div class="low-stock-card">
-    <h3>⚠ Low Stock Warning</h3>
-
-    <?php foreach ($lowStockBooks as $book): ?>
-        <div class="low-stock-item">
-            <span><?php echo htmlspecialchars($book['title']); ?></span>
-
-            <span class="stock-badge 
-                <?php echo ($book['stock'] <= 2) ? 'danger' : 'warning'; ?>">
-                <?php echo $book['stock']; ?> left
-            </span>
-        </div>
-    <?php endforeach; ?>
-
+<!-- 🔥 LOW STOCK STAT CARD -->
+<div class="stat-grid">
+    <div class="stat danger-card">
+        <span>⚠ Low Stock</span><br>
+        <strong><?php echo $lowStockCount; ?> Items</strong>
+    </div>
 </div>
-<?php endif; ?>
 
 <!-- TABLE -->
 <div class="table-wrap">
@@ -118,29 +107,37 @@ while ($row = $lowStockQuery->fetch_assoc()) {
 
 <tbody>
 <?php while ($book = $books->fetch_assoc()): ?>
-<tr>
+
+<tr class="<?php 
+    if ($book['stock'] <= 2) echo 'row-danger';
+    elseif ($book['stock'] <= 5) echo 'row-warning';
+?>">
+
 <td>B<?php echo str_pad($book['book_id'], 3, '0', STR_PAD_LEFT); ?></td>
 <td><?php echo htmlspecialchars($book['title']); ?></td>
 <td><?php echo htmlspecialchars($book['author']); ?></td>
 <td><?php echo htmlspecialchars($book['category']); ?></td>
 <td>RM<?php echo number_format($book['price'], 2); ?></td>
 
-<!-- 🔥 STOCK COLOR -->
 <td>
-<span class="
-<?php 
-if ($book['stock'] <= 2) echo 'stock-danger';
-elseif ($book['stock'] <= 5) echo 'stock-warning';
-?>">
-<?php echo $book['stock']; ?>
-</span>
+    <?php if ($book['stock'] <= 2): ?>
+        <span class="stock-pill danger">🔴<?php echo $book['stock']; ?> </span>
+
+    <?php elseif ($book['stock'] <= 5): ?>
+        <span class="stock-pill warning">🟡<?php echo $book['stock']; ?> </span>
+
+    <?php else: ?>
+        <span class="stock-pill normal">🟢<?php echo $book['stock']; ?></span>
+    <?php endif; ?>
 </td>
 
 <td>
-<a class="btn secondary" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
-<a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>">Delete</a>
+<a class="btn secondary edit-btn" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
+<a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>" onclick="return confirm('Delete this book?')">Delete</a>
 </td>
+
 </tr>
+
 <?php endwhile; ?>
 </tbody>
 </table>

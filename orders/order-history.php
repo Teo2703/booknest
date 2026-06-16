@@ -25,6 +25,43 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $orders = $stmt->get_result();
+
+$ordersList = [];
+
+while ($row = $orders->fetch_assoc()) {
+    $ordersList[] = $row;
+}
+
+$historyByOrder = [];
+
+if (!empty($ordersList)) {
+    $orderIds = array_column($ordersList, 'order_id');
+    $placeholders = implode(',', array_fill(0, count($orderIds), '?'));
+    $types = str_repeat('i', count($orderIds));
+
+    $historySql = "
+        SELECT 
+            order_status_history.order_id,
+            order_status_history.status,
+            order_status_history.changed_at,
+            order_status_history.note,
+            users.name AS changed_by_name
+        FROM order_status_history
+        LEFT JOIN users 
+            ON order_status_history.changed_by_user_id = users.user_id
+        WHERE order_status_history.order_id IN ($placeholders)
+        ORDER BY order_status_history.changed_at ASC, order_status_history.history_id ASC
+    ";
+
+    $historyStmt = $conn->prepare($historySql);
+    $historyStmt->bind_param($types, ...$orderIds);
+    $historyStmt->execute();
+    $historyResult = $historyStmt->get_result();
+
+    while ($history = $historyResult->fetch_assoc()) {
+        $historyByOrder[(int)$history['order_id']][] = $history;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -63,7 +100,7 @@ $orders = $stmt->get_result();
         <?php endif; ?>
 
         <div class="table-wrap">
-            <?php if ($orders->num_rows === 0): ?>
+            <?php if (empty($ordersList)): ?>
                 <div class="notice">
                     You have not placed any orders yet.
                     <a href="../books/books.php" style="font-weight:700;color:#7b4b2a;">Browse books now</a>.
@@ -77,10 +114,11 @@ $orders = $stmt->get_result();
                             <th>Items</th>
                             <th>Total</th>
                             <th>Status</th>
+                            <th>Tracking</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($order = $orders->fetch_assoc()): ?>
+                        <?php foreach ($ordersList as $order): ?>
                             <?php
                                 $items = [];
                                 if (!empty($order['item_list'])) {
@@ -106,10 +144,77 @@ $orders = $stmt->get_result();
                                         <?php echo htmlspecialchars($order['status']); ?>
                                     </span>
                                 </td>
+                                <td>
+                                    <button 
+                                        type="button" 
+                                        class="btn secondary track-btn" 
+                                        data-modal-target="track-modal-<?php echo (int)$order['order_id']; ?>"
+                                    >
+                                        Track
+                                    </button>
+                                </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
+                <?php foreach ($ordersList as $order): ?>
+                    <?php 
+                        $orderId = (int)$order['order_id'];
+                        $trackingHistory = $historyByOrder[$orderId] ?? [];
+                    ?>
+
+                    <div class="modal-overlay" id="track-modal-<?php echo $orderId; ?>">
+                        <div class="tracking-modal">
+                            <button type="button" class="modal-close" data-modal-close>&times;</button>
+
+                            <p class="eyebrow">Order Tracking</p>
+                            <h2>#BN<?php echo str_pad($orderId, 4, '0', STR_PAD_LEFT); ?></h2>
+
+                            <div class="tracking-summary">
+                                <div>
+                                    <strong>Date</strong>
+                                    <span><?php echo date("d M Y", strtotime($order['order_date'])); ?></span>
+                                </div>
+                                <div>
+                                    <strong>Total</strong>
+                                    <span>RM<?php echo number_format($order['total_amount'], 2); ?></span>
+                                </div>
+                                <div>
+                                    <strong>Current Status</strong>
+                                    <span class="status <?php echo strtolower(trim($order['status'])); ?>">
+                                        <?php echo htmlspecialchars($order['status']); ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="timeline">
+                                <?php if (empty($trackingHistory)): ?>
+                                    <div class="notice">No tracking history available.</div>
+                                <?php else: ?>
+                                    <?php foreach ($trackingHistory as $history): ?>
+                                        <div class="timeline-item <?php echo strtolower(trim($history['status'])); ?>">
+                                            <div class="timeline-dot"></div>
+
+                                            <div class="timeline-content">
+                                                <strong><?php echo htmlspecialchars($history['status']); ?></strong>
+                                                <p><?php echo date("d M Y, h:i A", strtotime($history['changed_at'])); ?></p>
+
+                                                <?php if (!empty($history['note'])): ?>
+                                                    <span class="small"><?php echo htmlspecialchars($history['note']); ?></span>
+                                                <?php endif; ?>
+
+                                                <span class="small">
+                                                    Updated by: 
+                                                    <?php echo htmlspecialchars($history['changed_by_name'] ?? 'System'); ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             <?php endif; ?>
         </div>
     </div>
@@ -135,6 +240,39 @@ $orders = $stmt->get_result();
         </div>
     </div>
 </footer>
+<script>
+document.querySelectorAll('[data-modal-target]').forEach(function(button) {
+    button.addEventListener('click', function() {
+        const modalId = button.getAttribute('data-modal-target');
+        const modal = document.getElementById(modalId);
 
+        if (modal) {
+            modal.classList.add('show');
+        }
+    });
+});
+
+document.querySelectorAll('[data-modal-close]').forEach(function(button) {
+    button.addEventListener('click', function() {
+        button.closest('.modal-overlay').classList.remove('show');
+    });
+});
+
+document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+    overlay.addEventListener('click', function(event) {
+        if (event.target === overlay) {
+            overlay.classList.remove('show');
+        }
+    });
+});
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.show').forEach(function(modal) {
+            modal.classList.remove('show');
+        });
+    }
+});
+</script>
 </body>
 </html>

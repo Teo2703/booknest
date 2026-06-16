@@ -112,7 +112,7 @@ if ($search != '') {
                 </div>
 
                 <!-- Add Book Form -->
-                <form id="add-book" class="form-card" style="margin-top:1.4rem" method="POST" action="add-book.php">
+                <form id="add-book" class="form-card" style="margin-top:1.4rem" method="POST" action="add-book.php" novalidate>
                     <h2>Add Book Form</h2>
 
                     <div class="form-grid">
@@ -185,6 +185,6 @@ if ($search != '') {
 
         </div>
     </footer>
-
+<script src="../js/validation.js"></script>
 </body>
 </html>

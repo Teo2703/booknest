@@ -53,6 +53,7 @@ while ($row = $featured->fetch_assoc()) {
                 <?php else: ?>
                     <a href="orders/cart.php">Cart</a>
                     <a href="orders/order-history.php">Orders</a>
+                     <a href="auth/profile.php">Profile</a>
                     <a href="auth/logout.php">
                         👤 <?php echo htmlspecialchars($_SESSION['user_name']); ?> | Logout
                     </a>

@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <main class="section">
     <div class="container auth">
-        <form class="form-card" method="POST" action="register.php">
+        <form id="registerForm" class="form-card" method="POST" action="register.php" novalidate>
             <h2>Customer Registration</h2>
 
             <?php if (!empty($errors)): ?>
@@ -169,6 +169,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </div>
 </footer>
-
+<script src="../js/validation.js"></script>
 </body>
 </html>

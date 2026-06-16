@@ -2,12 +2,17 @@
 include '../app.php';
 requireAdmin();
 
-$statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
-if ($statusFilter === '' && isset($_GET['status-select'])) {
-    $statusFilter = $_GET['status-select'];
-}
-$search = isset($_GET['search']) ? $_GET['search'] : '';
+/* ======================
+GET FILTER VALUES
+====================== */
+$search = $_GET['search'] ?? '';
+$statusFilter = $_GET['status'] ?? ($_GET['status-select'] ?? '');
+$from = $_GET['from_date'] ?? '';
+$to   = $_GET['to_date'] ?? '';
 
+/* ======================
+BASE QUERY
+====================== */
 $sql = "
     SELECT orders.order_id, users.name, orders.order_date, orders.total_amount, orders.status
     FROM orders
@@ -18,7 +23,8 @@ $sql = "
 $params = [];
 $types = "";
 
-if ($search != '') {
+/* SEARCH */
+if (!empty($search)) {
     $sql .= " AND (orders.order_id LIKE ? OR users.name LIKE ?)";
     $keyword = "%$search%";
     $params[] = $keyword;
@@ -26,16 +32,31 @@ if ($search != '') {
     $types .= "ss";
 }
 
-if ($statusFilter != '' && $statusFilter != 'All Status') {
+/* STATUS */
+if (!empty($statusFilter) && $statusFilter !== 'All Status') {
     $sql .= " AND orders.status = ?";
     $params[] = $statusFilter;
     $types .= "s";
 }
 
+/* DATE FILTER 🔥 */
+if (!empty($from) && !empty($to)) {
+    $sql .= " AND DATE(orders.order_date) BETWEEN ? AND ?";
+    $params[] = $from;
+    $params[] = $to;
+    $types .= "ss";
+}
+
+/* ORDER */
 $sql .= " ORDER BY orders.order_date DESC";
 
+/* EXECUTE */
 $stmt = $conn->prepare($sql);
-    
+
+if (!$stmt) {
+    die("SQL Error: " . $conn->error);
+}
+
 if (!empty($params)) {
     $stmt->bind_param($types, ...$params);
 }
@@ -113,12 +134,7 @@ $orders = $stmt->get_result();
                     </select>
 
                     <button class="btn secondary filter-btn" type="submit">Filter</button>
-                    <a href="export-orders.php?
-                    search=<?php echo urlencode($search); ?>
-                    &status=<?php echo urlencode($statusFilter); ?>
-                    &from=<?php echo $_GET['from_date'] ?? ''; ?>
-                    &to=<?php echo $_GET['to_date'] ?? ''; ?>"
-                    class="btn export-btn">
+                    <a href="export-orders.php?search=<?php echo urlencode($search); ?>&status=<?php echo urlencode($statusFilter); ?>&from_date=<?php echo urlencode($from); ?>&to_date=<?php echo urlencode($to); ?>" class="btn export-btn">
                     ⬇ Export CSV
                     </a>
                 </form>

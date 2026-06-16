@@ -43,19 +43,7 @@ $orderCount = $orderStmt->get_result()->fetch_assoc()["total_orders"];
     </div>
 </div>
 
-<header class="navbar">
-    <div class="container nav-inner">
-        <a class="brand" href="../index.php">Book<span>Nest</span></a>
-        <nav class="nav-links">
-            <a href="../index.php">Home</a>
-            <a href="../books/books.php">Books</a>
-            <a href="../orders/cart.php">Cart</a>
-            <a href="../orders/order-history.php">Orders</a>
-            <a class="active" href="profile.php">Profile</a>
-            <a href="logout.php">Logout</a>
-        </nav>
-    </div>
-</header>
+<?php include __DIR__ . '/../includes/navigation.php'; ?>
 
 <section class="page-title">
     <div class="container">

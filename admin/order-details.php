@@ -45,7 +45,7 @@ $items = $stmt2->get_result();
 <h1>Order Details</h1>
 
 <!-- ORDER SUMMARY -->
-<div class="card">
+<div class="card1">
     <p><strong>Order ID:</strong> #BN<?php echo str_pad($order['order_id'],4,'0',STR_PAD_LEFT); ?></p>
     <p><strong>Customer:</strong> <?php echo htmlspecialchars($order['name']); ?></p>
     <p><strong>Date:</strong> <?php echo $order['order_date']; ?></p>

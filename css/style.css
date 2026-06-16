@@ -156,7 +156,6 @@ a {
     gap: 10px;
 }
 
-/* FIX VIEW BUTTON SIZE */
 .view1-btn {
     background: #6b4f3b;
     color: white;
@@ -166,6 +165,7 @@ a {
     height: 36px;
     display: flex;
     align-items: center;
+    min-width: 235px;
 }
 
 .login-btn, .create-btn, .register-btn, .already-btn{
@@ -295,6 +295,16 @@ td .btn {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     margin-top: 1rem;
+    margin-bottom: 1.5rem;
+
+}
+
+.card1{
+        background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
 }
 
 .hero-card {

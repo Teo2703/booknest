@@ -75,7 +75,18 @@ while ($row = $featured->fetch_assoc()) {
 
                 <?php foreach ($featuredBooks as $b): ?>
                 <article class="card">
-                    <div class="book-cover"><?php echo htmlspecialchars($b['title']); ?></div>
+                    <?php
+                    $imageFile = __DIR__ . '/uploads/books/' . $b['image'];
+                    $imagePath = 'uploads/books/' . $b['image'];
+                    ?>
+
+                    <div class="book-cover">
+                        <?php if (!empty($b['image']) && file_exists($imageFile)): ?>
+                            <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($b['title']); ?>">
+                        <?php else: ?>
+                            <span><?php echo htmlspecialchars($b['title']); ?></span>
+                        <?php endif; ?>
+                    </div>
                     <div class="card-body">
                         <span class="tag"><?php echo htmlspecialchars($b['category']); ?></span>
                         <h3 class="book-title"><?php echo htmlspecialchars($b['title']); ?></h3>

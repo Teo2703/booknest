@@ -112,7 +112,7 @@ if ($search != '') {
                 </div>
 
                 <!-- Add Book Form -->
-                <form id="add-book" class="form-card" style="margin-top:1.4rem" method="POST" action="add-book.php" novalidate>
+                <form id="add-book" class="form-card" style="margin-top:1.4rem" method="POST" action="add-book.php" enctype="multipart/form-data" novalidate>
                     <h2>Add Book Form</h2>
 
                     <div class="form-grid">
@@ -146,6 +146,11 @@ if ($search != '') {
                             <label>Stock</label>
                             <input class="input" name="stock" type="number" placeholder="Quantity" required>
                         </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Book Image</label>
+                        <input class="input" name="image" type="file" accept="image/*">
                     </div>
 
                     <div class="field">

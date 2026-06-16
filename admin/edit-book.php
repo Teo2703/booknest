@@ -29,20 +29,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stock = $_POST['stock'];
     $description = $_POST['description'];
 
+    $image = $book['image'];
+
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = ['jpg', 'jpeg', 'png', 'webp'];
+        $originalName = $_FILES['image']['name'];
+        $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+        if (!in_array($extension, $allowedTypes)) {
+            die("Only JPG, JPEG, PNG, and WEBP images are allowed.");
+        }
+
+        $image = uniqid('book_', true) . '.' . $extension;
+
+        $uploadDir = __DIR__ . '/../uploads/books/';
+
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $image);
+    }
+
     $updateStmt = $conn->prepare("
         UPDATE books
-        SET title = ?, author = ?, category = ?, price = ?, stock = ?, description = ?
+        SET title = ?, author = ?, category = ?, price = ?, stock = ?, description = ?, image = ?
         WHERE book_id = ?
     ");
 
     $updateStmt->bind_param(
-        "sssdisi",
+        "sssdissi",
         $title,
         $author,
         $category,
         $price,
         $stock,
         $description,
+        $image,
         $book_id
     );
 
@@ -102,7 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </aside>
 
         <section>
-           <form id="edit-book" class="form-card" method="POST" novalidate>
+           <form id="edit-book" class="form-card" method="POST" enctype="multipart/form-data" novalidate>
                 <h2>Edit Book Form</h2>
 
                 <div class="form-grid">
@@ -159,6 +182,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             required
                         >
                     </div>
+                </div>
+
+                <div class="field">
+                    <label>Book Image</label>
+
+                    <?php if (!empty($book['image'])): ?>
+                        <p class="meta">Current image: <?php echo htmlspecialchars($book['image']); ?></p>
+                        <img 
+                            src="../uploads/books/<?php echo htmlspecialchars($book['image']); ?>" 
+                            alt="<?php echo htmlspecialchars($book['title']); ?>" 
+                            style="width:120px;height:90px;object-fit:cover;border-radius:12px;margin-bottom:10px;"
+                        >
+                    <?php endif; ?>
+
+                    <input class="input" name="image" type="file" accept="image/*">
                 </div>
 
                 <div class="field">

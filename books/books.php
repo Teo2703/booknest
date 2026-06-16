@@ -45,7 +45,7 @@ $books = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Books | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css?v=123">
+    <link rel="stylesheet" href="../css/style.css?v=124">
 </head>
 <body>
 
@@ -94,7 +94,18 @@ $books = $stmt->get_result();
 
                 <?php while ($book = $books->fetch_assoc()): ?>
                 <article class="card">
-                    <div class="book-cover"><?php echo htmlspecialchars($book['title']); ?></div>
+                    <?php
+                    $imageFile = __DIR__ . '/../uploads/books/' . $book['image'];
+                    $imagePath = '../uploads/books/' . $book['image'];
+                    ?>
+
+                    <div class="book-cover">
+                        <?php if (!empty($book['image']) && file_exists($imageFile)): ?>
+                            <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($book['title']); ?>">
+                        <?php else: ?>
+                            <span><?php echo htmlspecialchars($book['title']); ?></span>
+                        <?php endif; ?>
+                    </div>
                     <div class="card-body">
                         <span class="tag"><?php echo htmlspecialchars($book['category']); ?></span>
                         <h3 class="book-title"><?php echo htmlspecialchars($book['title']); ?></h3>

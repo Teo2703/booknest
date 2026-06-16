@@ -330,8 +330,7 @@ td .btn {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     margin-top: 1rem;
-    margin-bottom: 1.5rem;
-
+    margin-bottom: 1rem;
 }
 
 .card1{
@@ -389,7 +388,18 @@ td .btn {
     align-items: center;
     justify-content: space-between;
     background: var(--paper);
+    margin-top: auto;
 }
+
+.actions2 {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--paper);
+    margin-top: 1.5rem !important;
+}
+
 
 .section {
     padding: 3rem 0;
@@ -564,18 +574,17 @@ td .btn {
     justify-self: flex-end; /* align right */
 }
 
-.input1{
+.input1,
+select{
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: .78rem .9rem;
     background: #fff;
     font: inherit;
     color: var(--ink);
-    width: 100%;
 }
 
 .input,
-select,
 textarea {
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -583,6 +592,7 @@ textarea {
     background: #fff;
     font: inherit;
     color: var(--ink);
+    width: 100%;
 }
 
 .filters input[type="date"] {

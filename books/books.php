@@ -70,7 +70,7 @@ $books = $stmt->get_result();
         <div class="container">
 
             <form method="GET" class="filters">
-                <input class="input" name="search" placeholder="Search by title or author" value="<?php echo htmlspecialchars($search); ?>">
+                <input class="input1" name="search" placeholder="Search by title or author" value="<?php echo htmlspecialchars($search); ?>">
                 <select name="category">
                     <option value="">All Categories</option>
                     <option value="Fiction"          <?php if($category=="Fiction")          echo "selected"; ?>>Fiction</option>

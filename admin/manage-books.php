@@ -81,7 +81,7 @@ $lowStockCount = count($lowStockBooks);
     <a class="btn" href="#add-book">Add New Book</a>
 
     <input 
-        class="input1" 
+        class="input" 
         name="search" 
         style="max-width:530px" 
         placeholder="Search book" 

@@ -25,7 +25,7 @@ $book = $result->fetch_assoc();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($book['title']); ?> | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=124">
 </head>
 <body>
 
@@ -49,8 +49,17 @@ $book = $result->fetch_assoc();
     <main class="section">
         <div class="container two-col">
 
+            <?php
+            $imageFile = __DIR__ . '/../uploads/books/' . $book['image'];
+            $imagePath = '../uploads/books/' . $book['image'];
+            ?>
+
             <div class="detail-cover">
-                <?php echo htmlspecialchars($book['title']); ?>
+                <?php if (!empty($book['image']) && file_exists($imageFile)): ?>
+                    <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($book['title']); ?>">
+                <?php else: ?>
+                    <span><?php echo htmlspecialchars($book['title']); ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="form-card">

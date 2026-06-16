@@ -37,7 +37,7 @@ $lowStockCount = count($lowStockBooks);
 <head>
 <meta charset="UTF-8">
 <title>Manage Books | BookNest</title>
-<link rel="stylesheet" href="../css/style.css?v=123">
+<link rel="stylesheet" href="../css/style.css?v=124">
 </head>
 
 <body>
@@ -76,18 +76,46 @@ $lowStockCount = count($lowStockBooks);
 
 <section>
 
-<!-- SEARCH -->
-<form method="GET" class="actions">
-    <input class="input" name="search" placeholder="Search book" value="<?php echo htmlspecialchars($search); ?>">
-    <button class="btn secondary">Search</button>
+<!-- SEARCH + ADD BOOK SHORTCUT -->
+<form method="GET" class="actions" style="margin-top:0;margin-bottom:1rem">
+    <a class="btn" href="#add-book">Add New Book</a>
+
+    <input 
+        class="input" 
+        name="search" 
+        style="max-width:530px" 
+        placeholder="Search book" 
+        value="<?php echo htmlspecialchars($search); ?>"
+    >
+
+    <button class="btn secondary search-btn" type="submit">Search</button>
 </form>
 
+<<<<<<< HEAD
 <!-- 🔥 LOW STOCK STAT CARD -->
 <div class="stat-grid">
     <div class="stat danger-card">
         <span>⚠ Low Stock</span><br>
         <strong><?php echo $lowStockCount; ?> Items</strong>
     </div>
+=======
+<!-- LOW STOCK WARNING -->
+<?php if (!empty($lowStockBooks)): ?>
+<div class="low-stock-card">
+    <h3>⚠ Low Stock Warning</h3>
+
+    <?php foreach ($lowStockBooks as $book): ?>
+        <div class="low-stock-item">
+            <span><?php echo htmlspecialchars($book['title']); ?></span>
+
+            <span class="stock-badge 
+                <?php echo ($book['stock'] <= 2) ? 'danger' : 'warning'; ?>">
+                <?php echo $book['stock']; ?> left
+            </span>
+        </div>
+    <?php endforeach; ?>
+
+>>>>>>> fc8c952bb0cb8f77de5c6c1f4b6070b1abc52470
 </div>
 
 <!-- TABLE -->
@@ -119,6 +147,10 @@ $lowStockCount = count($lowStockBooks);
 <td><?php echo htmlspecialchars($book['category']); ?></td>
 <td>RM<?php echo number_format($book['price'], 2); ?></td>
 
+<<<<<<< HEAD
+=======
+<!-- STOCK COLOR -->
+>>>>>>> fc8c952bb0cb8f77de5c6c1f4b6070b1abc52470
 <td>
     <?php if ($book['stock'] <= 2): ?>
         <span class="stock-pill danger">🔴<?php echo $book['stock']; ?> </span>
@@ -133,7 +165,15 @@ $lowStockCount = count($lowStockBooks);
 
 <td>
 <a class="btn secondary edit-btn" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
+<<<<<<< HEAD
 <a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>" onclick="return confirm('Delete this book?')">Delete</a>
+=======
+<a 
+    class="btn danger" 
+    href="delete-book.php?id=<?php echo $book['book_id']; ?>" 
+    onclick="return confirm('Delete this book?')"
+>Delete</a>
+>>>>>>> fc8c952bb0cb8f77de5c6c1f4b6070b1abc52470
 </td>
 
 </tr>
@@ -143,9 +183,68 @@ $lowStockCount = count($lowStockBooks);
 </table>
 </div>
 
+<!-- ADD BOOK FORM -->
+<form 
+    id="add-book" 
+    class="form-card" 
+    style="margin-top:1.4rem" 
+    method="POST" 
+    action="add-book.php" 
+    enctype="multipart/form-data" 
+    novalidate
+>
+    <h2>Add Book Form</h2>
+
+    <div class="form-grid">
+        <div class="field">
+            <label>Title</label>
+            <input class="input" name="title" placeholder="Book title" required>
+        </div>
+
+        <div class="field">
+            <label>Author</label>
+            <input class="input" name="author" placeholder="Author name" required>
+        </div>
+
+        <div class="field">
+            <label>Category</label>
+            <select name="category" required>
+                <option value="Fiction">Fiction</option>
+                <option value="Academic">Academic</option>
+                <option value="Children">Children</option>
+                <option value="Self-Improvement">Self-Improvement</option>
+                <option value="Comics">Comics</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Price</label>
+            <input class="input" name="price" type="number" step="0.01" min="0" placeholder="RM" required>
+        </div>
+
+        <div class="field">
+            <label>Stock</label>
+            <input class="input" name="stock" type="number" min="0" placeholder="Quantity" required>
+        </div>
+
+        <div class="field">
+            <label>Book Image</label>
+            <input class="input" name="image" type="file" accept="image/*">
+        </div>
+    </div>
+
+    <div class="field">
+        <label>Description</label>
+        <textarea name="description" rows="4" placeholder="Book description"></textarea>
+    </div>
+
+    <button class="btn" type="submit">Save Book</button>
+</form>
+
 </section>
 </div>
 </main>
 
+<script src="../js/validation.js"></script>
 </body>
 </html>

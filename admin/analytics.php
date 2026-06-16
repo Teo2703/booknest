@@ -70,7 +70,55 @@ while ($row = $orderQuery->fetch_assoc()) {
 ====================== */
 $totalRevenue = array_sum($totals);
 $totalOrdersCount = array_sum($orderCounts);
+
+/* ======================
+   SALES ANALYSIS
+====================== */
+
+$bestDay = "N/A";
+$worstDay = "N/A";
+$maxSales = 0;
+$minSales = PHP_INT_MAX;
+$totalSales = 0;
+$countDays = 0;
+
+/* get sales data */
+$salesQuery = $conn->query("
+    SELECT DATE(order_date) as date, SUM(total_amount) as total
+    FROM orders
+    WHERE status = 'Completed'
+    GROUP BY DATE(order_date)
+");
+
+while ($row = $salesQuery->fetch_assoc()) {
+
+    $date = $row['date'];
+    $total = $row['total'];
+
+    $totalSales += $total;
+    $countDays++;
+
+    /* best day */
+    if ($total > $maxSales) {
+        $maxSales = $total;
+        $bestDay = date("d M", strtotime($date));
+    }
+
+    /* worst day */
+    if ($total < $minSales) {
+        $minSales = $total;
+        $worstDay = date("d M", strtotime($date));
+    }
+}
+
+/* average */
+$avgSales = ($countDays > 0) ? $totalSales / $countDays : 0;
+
+/* trend */
+$trend = ($countDays > 1 && $maxSales > $minSales) ? "Upward 📈" : "Stable";
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">

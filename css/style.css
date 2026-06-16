@@ -143,6 +143,8 @@ a {
 
 .edit-btn {
     height: 40px;
+    width: 70px;
+    margin-bottom: 10px;
 }
 
 .view-btn, .cancel-btn {
@@ -164,7 +166,6 @@ a {
     font-size: 0.85rem;
     height: 36px;
     display: flex;
-    width: 100%;
     text-align: center;
     padding: 8px 0;
     border-radius: 8px;
@@ -200,6 +201,7 @@ a {
     border-radius: 12px;
     font-size: 0.85rem;
     font-weight: 600;
+    width: 100px;
 }
 
 /* Fix select width */
@@ -562,6 +564,16 @@ td .btn {
 .filters .searchbook-btn {
     grid-column: 1 / -1;   /* full width */
     justify-self: flex-end; /* align right */
+}
+
+.input1{
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: .78rem .9rem;
+    background: #fff;
+    font: inherit;
+    color: var(--ink);
+    width: 100%;
 }
 
 .input,

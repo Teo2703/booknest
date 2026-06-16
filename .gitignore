@@ -1,2 +1,2 @@
-config/db_config.php
-config/ca.pem
+db_config.php
+ca.pem

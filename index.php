@@ -92,7 +92,7 @@ while ($row = $featured->fetch_assoc()) {
                         <h3 class="book-title"><?php echo htmlspecialchars($b['title']); ?></h3>
                         <p class="meta">by <?php echo htmlspecialchars($b['author']); ?></p>
                         <p class="price">RM<?php echo number_format($b['price'], 2); ?></p>
-                        <a class="btn secondary" href="books/book-detail.php?id=<?php echo $b['book_id']; ?>">View Details</a>
+                        <a class="btn secondary view-btn" href="books/book-detail.php?id=<?php echo $b['book_id']; ?>">View Details</a>
                     </div>
                 </article>
                 <?php endforeach; ?>

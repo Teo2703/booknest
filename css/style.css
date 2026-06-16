@@ -152,8 +152,9 @@ a {
 
 .action-cell {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 180px;
 }
 
 .view1-btn {
@@ -164,19 +165,16 @@ a {
     font-size: 0.85rem;
     height: 36px;
     display: flex;
-    width: 100% !important;
+    width: 100%;
     text-align: center;
     padding: 8px 0;
     border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 16px;
 }
 
 .view1-btn:hover {
     background: #543d2b;
-}
-
-.back-btn {
-    display: block;
-    margin-top: 20px;
 }
 
 .login-btn, .create-btn, .register-btn, .already-btn{
@@ -189,7 +187,6 @@ a {
 .update-form {
     display: flex;
     gap: 10px;
-    align-items: center;
 }
 
 /* SAME SIZE */
@@ -224,6 +221,13 @@ a {
     padding: 0.4rem 1rem;
     transition: all 0.2s ease;
     width: 70px;
+}
+
+.logout-btn {
+    height: 50px;
+}
+
+.delete-btn {
     height: 40px;
 }
 
@@ -365,6 +369,8 @@ td .btn {
     align-items: center;
     justify-content: space-between;
     background: var(--paper);
+    margin-bottom: 1.5rem !important;
+    padding: 1rem 0rem;
 }
 
 .section {

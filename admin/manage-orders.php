@@ -51,7 +51,7 @@ $orders = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Orders | BookNest</title>
 
-<link rel="stylesheet" href="../css/style.css?v=123">
+<link rel="stylesheet" href="../css/style.css?v=999">
 </head>
 
 <body>

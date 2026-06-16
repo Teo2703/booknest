@@ -154,7 +154,7 @@ $lowStockCount = count($lowStockBooks);
 <td>
 <a class="btn secondary edit-btn" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
 
-<a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>" onclick="return confirm('Delete this book?')">Delete</a>
+<a class="btn danger delete-btn" href="delete-book.php?id=<?php echo $book['book_id']; ?>" onclick="return confirm('Delete this book?')">Delete</a>
 
 </td>
 

@@ -78,8 +78,7 @@ $items = $stmt2->get_result();
 </table>
 </div>
 
-<a href="manage-orders.php" class="btn back-btn">⬅ Back</a>
-
+<a href="manage-orders.php" class="btn back-btn" style="margin-top:30px;">⬅ Back</a>
 </div>
 
 </body>

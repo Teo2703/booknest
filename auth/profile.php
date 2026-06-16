@@ -32,7 +32,7 @@ $orderCount = $orderStmt->get_result()->fetch_assoc()["total_orders"];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Profile | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style.css?v=999">
 </head>
 <body>
 
@@ -93,10 +93,10 @@ $orderCount = $orderStmt->get_result()->fetch_assoc()["total_orders"];
                 <strong><?php echo htmlspecialchars($user["created_at"]); ?></strong>
             </div>
 
-            <div class="actions">
+            <div class="actions1">
                 <a class="btn" href="../books/books.php">Browse Books</a>
-                <a class="btn secondary" href="../orders/order-history.php">View Orders</a>
-                <a class="btn danger" href="logout.php">Logout</a>
+                <a class="btn secondary view-btn" href="../orders/order-history.php">View Orders</a>
+                <a class="btn danger logout-btn" href="logout.php">Logout</a>
             </div>
         </div>
     </div>

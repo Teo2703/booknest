@@ -91,6 +91,7 @@ $orders = $stmt->get_result();
                 <a href="admin-dashboard.php">Dashboard</a>
                 <a href="manage-books.php">Manage Books</a>
                 <a class="active" href="manage-orders.php">Manage Orders</a>
+                <a href="analytics.php">Analytics</a>
                 <a href="../auth/logout.php">Logout</a>
             </aside>
 

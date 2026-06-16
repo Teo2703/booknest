@@ -764,3 +764,120 @@ th {
         font-size: 1.7rem;
     }
 }
+
+.chart-card {
+    background: var(--paper);
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+canvas {
+    width: 100% !important;
+    height: 300px !important;
+}
+
+.insight-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.insight-box {
+    background: white;
+    padding: 1rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+/* Hover animation */
+.insight-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Icon */
+.icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+}
+
+/* Text */
+.insight-box p {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.insight-box h3 {
+    margin: 0.3rem 0;
+}
+
+/* Mini chart */
+.mini-chart {
+    height: 40px !important;
+}
+
+/* Color themes */
+.best { border-top: 4px solid #2ecc71; }
+.low { border-top: 4px solid #e74c3c; }
+.avg { border-top: 4px solid #3498db; }
+.trend { border-top: 4px solid #f39c12; }
+
+/* Trend color */
+.trend-text {
+    color: green;
+}
+
+.trend-text:contains("Decreasing") {
+    color: red;
+}
+
+/* LOW STOCK CARD */
+.low-stock-card {
+    background: #fff5f5;
+    border-left: 6px solid #e74c3c;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.low-stock-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: white;
+    margin-top: 5px;
+    border-radius: 8px;
+}
+
+/* BADGE */
+.stock-badge.warning {
+    background: #ffeaa7;
+    color: #8a6d00;
+    padding: 3px 8px;
+    border-radius: 999px;
+}
+
+.stock-badge.danger {
+    background: #fde2e2;
+    color: #c0392b;
+    padding: 3px 8px;
+    border-radius: 999px;
+}
+
+/* TABLE STOCK COLOR */
+.stock-warning {
+    color: orange;
+    font-weight: bold;
+}
+
+.stock-danger {
+    color: red;
+    font-weight: bold;
+}

@@ -35,7 +35,7 @@ while ($row = $featured->fetch_assoc()) {
         </div>
     </div>
 
-    <?php include __DIR__ . '/includes/navigation.php'; ?>
+<?php include __DIR__ . '/includes/navigation.php'; ?>
 
     <section class="hero">
         <div class="container hero-grid">
@@ -66,7 +66,7 @@ while ($row = $featured->fetch_assoc()) {
                     <h2>Featured Books</h2>
                     <p>Most popular books in our store.</p>
                 </div>
-                <a class="btn secondary all-btn" href="books/books.php">View All</a>
+                <a class="btn secondary" href="books/books.php">View All</a>
             </div>
             <div class="grid grid-3">
                 <?php if (empty($featuredBooks)): ?>
@@ -92,7 +92,7 @@ while ($row = $featured->fetch_assoc()) {
                         <h3 class="book-title"><?php echo htmlspecialchars($b['title']); ?></h3>
                         <p class="meta">by <?php echo htmlspecialchars($b['author']); ?></p>
                         <p class="price">RM<?php echo number_format($b['price'], 2); ?></p>
-                        <a class="btn secondary detail-btn" href="books/book-detail.php?id=<?php echo $b['book_id']; ?>">View Details</a>
+                        <a class="btn secondary" href="books/book-detail.php?id=<?php echo $b['book_id']; ?>">View Details</a>
                     </div>
                 </article>
                 <?php endforeach; ?>

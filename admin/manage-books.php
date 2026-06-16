@@ -15,181 +15,140 @@ if ($search != '') {
 } else {
     $books = $conn->query("SELECT * FROM books ORDER BY book_id ASC");
 }
+
+/* ======================
+   LOW STOCK QUERY
+====================== */
+$lowStockQuery = $conn->query("
+    SELECT title, stock 
+    FROM books 
+    WHERE stock <= 5
+    ORDER BY stock ASC
+");
+
+$lowStockBooks = [];
+while ($row = $lowStockQuery->fetch_assoc()) {
+    $lowStockBooks[] = $row;
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Books | BookNest</title>
-
-    <link rel="stylesheet" href="../css/style.css?v=123">
+<meta charset="UTF-8">
+<title>Manage Books | BookNest</title>
+<link rel="stylesheet" href="../css/style.css?v=123">
 </head>
 
 <body>
 
-    <!-- Top Bar -->
-    <div class="topbar">
-        <div class="container">
-            <span>Mini Online Bookstore</span>
-            <span>Admin book management</span>
-        </div>
+<div class="topbar">
+    <div class="container">
+        <span>Mini Online Bookstore</span>
+        <span>Admin book management</span>
     </div>
+</div>
 
-    <!-- Navigation Bar -->
-    <header class="navbar">
-        <div class="container nav-inner">
-            <a class="brand" href="admin-dashboard.php">
-                Book<span>Nest</span>
-            </a>
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="admin-dashboard.php">
+            Book<span>Nest</span>
+        </a>
+    </div>
+</header>
+
+<section class="page-title">
+    <div class="container">
+        <h1>Manage Books</h1>
+    </div>
+</section>
+
+<main class="section">
+<div class="container admin-layout">
+
+<aside class="sidebar">
+    <a href="admin-dashboard.php">Dashboard</a>
+    <a class="active" href="manage-books.php">Manage Books</a>
+    <a href="manage-orders.php">Manage Orders</a>
+    <a href="analytics.php">Analytics</a>
+    <a href="../auth/logout.php">Logout</a>
+</aside>
+
+<section>
+
+<!-- SEARCH -->
+<form method="GET" class="actions">
+    <input class="input" name="search" placeholder="Search book" value="<?php echo htmlspecialchars($search); ?>">
+    <button class="btn secondary">Search</button>
+</form>
+
+<!-- 🔥 LOW STOCK WARNING -->
+<?php if (!empty($lowStockBooks)): ?>
+<div class="low-stock-card">
+    <h3>⚠ Low Stock Warning</h3>
+
+    <?php foreach ($lowStockBooks as $book): ?>
+        <div class="low-stock-item">
+            <span><?php echo htmlspecialchars($book['title']); ?></span>
+
+            <span class="stock-badge 
+                <?php echo ($book['stock'] <= 2) ? 'danger' : 'warning'; ?>">
+                <?php echo $book['stock']; ?> left
+            </span>
         </div>
-    </header>
+    <?php endforeach; ?>
 
-    <!-- Page Title -->
-    <section class="page-title">
-        <div class="container">
-            <p class="eyebrow">Admin Area</p>
-            <h1>Manage Books</h1>
-            <p>Admin can add, edit, delete, and update book records.</p>
-        </div>
-    </section>
+</div>
+<?php endif; ?>
 
-    <!-- Main Section -->
-    <main class="section">
-        <div class="container admin-layout">
+<!-- TABLE -->
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Title</th>
+<th>Author</th>
+<th>Category</th>
+<th>Price</th>
+<th>Stock</th>
+<th>Action</th>
+</tr>
+</thead>
 
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <a href="admin-dashboard.php">Dashboard</a>
-                <a class="active" href="manage-books.php">Manage Books</a>
-                <a href="manage-orders.php">Manage Orders</a>
-                <a href="../auth/logout.php">Logout</a>
-            </aside>
+<tbody>
+<?php while ($book = $books->fetch_assoc()): ?>
+<tr>
+<td>B<?php echo str_pad($book['book_id'], 3, '0', STR_PAD_LEFT); ?></td>
+<td><?php echo htmlspecialchars($book['title']); ?></td>
+<td><?php echo htmlspecialchars($book['author']); ?></td>
+<td><?php echo htmlspecialchars($book['category']); ?></td>
+<td>RM<?php echo number_format($book['price'], 2); ?></td>
 
-            <!-- Manage Books Content -->
-            <section>
+<!-- 🔥 STOCK COLOR -->
+<td>
+<span class="
+<?php 
+if ($book['stock'] <= 2) echo 'stock-danger';
+elseif ($book['stock'] <= 5) echo 'stock-warning';
+?>">
+<?php echo $book['stock']; ?>
+</span>
+</td>
 
-                <!-- Action Area -->
-                <form method="GET" class="actions" style="margin-top:0;margin-bottom:1rem">
-                    <a class="btn" href="#add-book">Add New Book</a>
-                    <input class="input" name="search" style="max-width:530px" placeholder="Search book record" value="<?php echo htmlspecialchars($search); ?>">
-                    <button class="btn secondary search-btn" type="submit">Search</button>
-                </form>
+<td>
+<a class="btn secondary" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
+<a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>">Delete</a>
+</td>
+</tr>
+<?php endwhile; ?>
+</tbody>
+</table>
+</div>
 
-                <!-- Book Table -->
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Book Title</th>
-                                <th>Author</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
+</section>
+</div>
+</main>
 
-                        <tbody>
-                            <?php while ($book = $books->fetch_assoc()): ?>
-                            <tr>
-                                <td>B<?php echo str_pad($book['book_id'], 3, '0', STR_PAD_LEFT); ?></td>
-                                <td><?php echo htmlspecialchars($book['title']); ?></td>
-                                <td><?php echo htmlspecialchars($book['author']); ?></td>
-                                <td><?php echo htmlspecialchars($book['category']); ?></td>
-                                <td>RM<?php echo number_format($book['price'], 2); ?></td>
-                                <td><?php echo $book['stock']; ?></td>
-                                <td>
-                                    <a class="btn secondary edit-btn" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
-                                    <a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>" onclick="return confirm('Delete this book?')">Delete</a>
-                                </td>
-                            </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Add Book Form -->
-                <form id="add-book" class="form-card" style="margin-top:1.4rem" method="POST" action="add-book.php" enctype="multipart/form-data" novalidate>
-                    <h2>Add Book Form</h2>
-
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Title</label>
-                            <input class="input" name="title" placeholder="Book title" required>
-                        </div>
-
-                        <div class="field">
-                            <label>Author</label>
-                            <input class="input" name="author" placeholder="Author name" required>
-                        </div>
-
-                        <div class="field">
-                            <label>Category</label>
-                            <select name="category" required>
-                                <option>Fiction</option>
-                                <option>Academic</option>
-                                <option>Children</option>
-                                <option>Self-Improvement</option>
-                                <option>Comics</option>
-                            </select>
-                        </div>
-
-                        <div class="field">
-                            <label>Price</label>
-                            <input class="input" name="price" type="number" step="0.01" placeholder="RM" required>
-                        </div>
-
-                        <div class="field">
-                            <label>Stock</label>
-                            <input class="input" name="stock" type="number" placeholder="Quantity" required>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>Book Image</label>
-                        <input class="input" name="image" type="file" accept="image/*">
-                    </div>
-
-                    <div class="field">
-                        <label>Description</label>
-                        <textarea name="description" rows="4" placeholder="Book description"></textarea>
-                    </div>
-
-                    <button class="btn" type="submit">Save Book</button>
-                </form>
-
-            </section>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer-grid">
-
-            <div>
-                <h3>BookNest</h3>
-                <p>A clean static prototype for the Mini Online Bookstore e-commerce system.</p>
-            </div>
-
-            <div>
-                <h4>Customer</h4>
-                <a href="../books/books.php">Browse Books</a>
-                <a href="../orders/cart.php">Shopping Cart</a>
-                <a href="../orders/checkout.php">Checkout</a>
-            </div>
-
-            <div>
-                <h4>Admin</h4>
-                <a href="admin-dashboard.php">Dashboard</a>
-                <a href="manage-books.php">Manage Books</a>
-                <a href="manage-orders.php">Manage Orders</a>
-            </div>
-
-        </div>
-    </footer>
-<script src="../js/validation.js"></script>
 </body>
 </html>

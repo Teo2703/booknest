@@ -91,14 +91,6 @@ $lowStockCount = count($lowStockBooks);
     <button class="btn secondary search-btn" type="submit">Search</button>
 </form>
 
-<!-- 🔥 LOW STOCK STAT CARD -->
-<div class="stat-grid">
-    <div class="stat danger-card">
-        <span>⚠ Low Stock</span><br>
-        <strong><?php echo $lowStockCount; ?> Items</strong>
-    </div>
-</div>
-
 <!-- 🔥 LOW STOCK WARNING -->
 <?php if (!empty($lowStockBooks)): ?>
 <div class="low-stock-card">
@@ -147,10 +139,6 @@ $lowStockCount = count($lowStockBooks);
 <td><?php echo htmlspecialchars($book['category']); ?></td>
 <td>RM<?php echo number_format($book['price'], 2); ?></td>
 
-<<<<<<< HEAD
-=======
-<!-- STOCK COLOR -->
->>>>>>> fc8c952bb0cb8f77de5c6c1f4b6070b1abc52470
 <td>
     <?php if ($book['stock'] <= 2): ?>
         <span class="stock-pill danger">🔴<?php echo $book['stock']; ?> </span>
@@ -165,15 +153,9 @@ $lowStockCount = count($lowStockBooks);
 
 <td>
 <a class="btn secondary edit-btn" href="edit-book.php?id=<?php echo $book['book_id']; ?>">Edit</a>
-<<<<<<< HEAD
+
 <a class="btn danger" href="delete-book.php?id=<?php echo $book['book_id']; ?>" onclick="return confirm('Delete this book?')">Delete</a>
-=======
-<a 
-    class="btn danger" 
-    href="delete-book.php?id=<?php echo $book['book_id']; ?>" 
-    onclick="return confirm('Delete this book?')"
->Delete</a>
->>>>>>> fc8c952bb0cb8f77de5c6c1f4b6070b1abc52470
+
 </td>
 
 </tr>

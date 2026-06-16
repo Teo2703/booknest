@@ -301,21 +301,7 @@ $total = $subtotal + $delivery;
     </div>
 </div>
 
-<header class="navbar">
-    <div class="container nav-inner">
-        <a class="brand" href="../index.php">Book<span>Nest</span></a>
-
-        <nav class="nav-links">
-            <a href="../index.php">Home</a>
-            <a href="../books/books.php">Books</a>
-            <a class="active" href="cart.php">Cart</a>
-            <a href="order-history.php">Orders</a>
-            <a href="../auth/logout.php">
-                👤 <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Customer'); ?> | Logout
-            </a>
-        </nav>
-    </div>
-</header>
+<?php include __DIR__ . '/../includes/navigation.php'; ?>
 
 <section class="page-title">
     <div class="container">

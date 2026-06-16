@@ -40,14 +40,9 @@ if ($search != '') {
     <!-- Navigation Bar -->
     <header class="navbar">
         <div class="container nav-inner">
-            <a class="brand" href="index.php">
+            <a class="brand" href="admin-dashboard.php">
                 Book<span>Nest</span>
             </a>
-
-            <nav class="nav-links">
-                <a href="../index.php">Home</a>
-                <a href="../books/books.php">Books</a>
-            </nav>
         </div>
     </header>
 
@@ -69,7 +64,7 @@ if ($search != '') {
                 <a href="admin-dashboard.php">Dashboard</a>
                 <a class="active" href="manage-books.php">Manage Books</a>
                 <a href="manage-orders.php">Manage Orders</a>
-                <a href="../index.php">Logout</a>
+                <a href="../auth/logout.php">Logout</a>
             </aside>
 
             <!-- Manage Books Content -->

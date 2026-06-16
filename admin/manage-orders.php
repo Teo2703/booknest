@@ -67,14 +67,9 @@ $orders = $stmt->get_result();
     <!-- Navigation Bar -->
     <header class="navbar">
         <div class="container nav-inner">
-            <a class="brand" href="index.php">
+            <a class="brand" href="admin-dashboard.php">
                 Book<span>Nest</span>
             </a>
-
-            <nav class="nav-links">
-                <a href="../index.php">Home</a>
-                <a href="../books/books.php">Books</a>
-            </nav>
         </div>
     </header>
 

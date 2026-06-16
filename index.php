@@ -70,9 +70,6 @@ while ($row = $featured->fetch_assoc()) {
                 <p>BookNest helps customers browse books, compare details, add items to cart, and place orders through a clean web-based bookstore interface.</p>
                 <div class="actions">
                     <a class="btn" href="books/books.php">Browse Books</a>
-                    <?php if (!isLoggedIn()): ?>
-                        <a class="btn secondary" href="auth/register.php">Create Account</a>
-                    <?php endif; ?>
                 </div>
             </div>
             <div class="hero-card">
@@ -94,7 +91,7 @@ while ($row = $featured->fetch_assoc()) {
                     <h2>Featured Books</h2>
                     <p>Most popular books in our store.</p>
                 </div>
-                <a class="btn secondary" href="books/books.php">View All</a>
+                <a class="btn secondary all-btn" href="books/books.php">View All</a>
             </div>
             <div class="grid grid-3">
                 <?php if (empty($featuredBooks)): ?>
@@ -109,7 +106,7 @@ while ($row = $featured->fetch_assoc()) {
                         <h3 class="book-title"><?php echo htmlspecialchars($b['title']); ?></h3>
                         <p class="meta">by <?php echo htmlspecialchars($b['author']); ?></p>
                         <p class="price">RM<?php echo number_format($b['price'], 2); ?></p>
-                        <a class="btn secondary" href="books/book-detail.php?id=<?php echo $b['book_id']; ?>">View Details</a>
+                        <a class="btn secondary detail-btn" href="books/book-detail.php?id=<?php echo $b['book_id']; ?>">View Details</a>
                     </div>
                 </article>
                 <?php endforeach; ?>

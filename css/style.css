@@ -141,6 +141,25 @@ a {
     height: 40px;
 }
 
+.filterexport-btn {
+    min-width: 800px;
+    grid-column: 1 / -1; 
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    background: #27ae60;
+    font-size: 15px;
+    height: 50px;
+    flex: 0 0 100%;
+}
+
+
+.filterexport-btn:hover {
+    background: #219150;
+}
+
 .edit-btn {
     height: 40px;
     width: 70px;
@@ -628,6 +647,7 @@ td .btn {
 .filters .searchbook-btn {
     grid-column: 1 / -1;   /* full width */
     justify-self: flex-end; /* align right */
+
 }
 
 .input1,
@@ -638,6 +658,7 @@ select{
     background: #fff;
     font: inherit;
     color: var(--ink);
+    width: 100%;
 }
 
 .input,

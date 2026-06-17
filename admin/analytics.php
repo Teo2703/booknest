@@ -157,7 +157,7 @@ $topBooks = $conn->query("
     <button class="btn secondary">Apply</button>
 
     <a href="export-sales.php?from=<?php echo $from; ?>&to=<?php echo $to; ?>" 
-    class="btn export-btn">
+    class="btn filterexport-btn">
     ⬇ Export CSV
     </a>
 </form>

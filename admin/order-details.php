@@ -5,7 +5,7 @@ requireAdmin();
 $order_id = isset($_GET['id']) ? $_GET['id'] : 0;
 
 /* ======================
-   ORDER INFO
+ORDER INFO
 ====================== */
 $stmt = $conn->prepare("
     SELECT orders.*, users.name 
@@ -18,7 +18,7 @@ $stmt->execute();
 $order = $stmt->get_result()->fetch_assoc();
 
 /* ======================
-   ORDER ITEMS
+ORDER ITEMS
 ====================== */
 $stmt2 = $conn->prepare("
     SELECT order_items.*, books.title 
@@ -52,6 +52,35 @@ $items = $stmt2->get_result();
     <p><strong>Total:</strong> RM<?php echo number_format($order['total_amount'],2); ?></p>
 </div>
 
+<?php
+$steps = ["Pending", "Processing", "Completed"];
+$currentIndex = array_search($order['status'], $steps);
+?>
+
+<div class="timeline">
+
+    <div class="timeline-line"></div>
+
+    <?php foreach ($steps as $index => $step): ?>
+        <div class="timeline-item">
+
+            <div class="circle 
+                <?php 
+                    if ($orderStatus == "Completed") {
+                        echo 'done';
+                    } else {
+                        if ($index < $currentIndex) echo 'done';
+                        elseif ($index == $currentIndex) echo 'active';
+                    }
+                ?>">
+            </div>
+
+            <p class="label"><?php echo $step; ?></p>
+
+        </div>
+    <?php endforeach; ?>
+
+</div>
 <!-- ORDER ITEMS -->
 <div class="table-wrap">
 <table>

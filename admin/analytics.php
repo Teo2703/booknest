@@ -106,7 +106,7 @@ $topBooks = $conn->query("
 <head>
 <meta charset="UTF-8">
 <title>Analytics | BookNest</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/style.css?v=999">
 </head>
 
 <body>
@@ -156,8 +156,9 @@ $topBooks = $conn->query("
 
     <button class="btn secondary">Apply</button>
 
-    <a href="export-sales.php?from=<?php echo $from; ?>&to=<?php echo $to; ?>" class="btn export-btn">
-        ⬇ Export CSV
+    <a href="export-sales.php?from=<?php echo $from; ?>&to=<?php echo $to; ?>" 
+    class="btn export-btn">
+    ⬇ Export CSV
     </a>
 </form>
 

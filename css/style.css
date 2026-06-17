@@ -241,6 +241,7 @@ a {
     background: #27ae60;
     font-size: 15px;
     height: 50px;
+    flex: 0 0 100%;
 }
 
 .export-btn:hover {
@@ -339,6 +340,60 @@ td .btn {
     border-radius: 12px;
     margin-bottom: 1rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+/* CONTAINER */
+.timeline {
+    position: relative;
+    display: flex !important;
+    justify-content: space-between;
+    margin: 40px 20px;
+}
+
+/* LINE */
+.timeline-line {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #ddd;
+    z-index: 0;
+}
+
+/* ITEM */
+.timeline-item {
+    position: relative;
+    text-align: center;
+    flex: 1;
+}
+
+.timeline::before {
+    display: none;
+}
+
+/* CIRCLE */
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ddd;
+    margin: 0 auto;
+    z-index: 1;
+    position: relative;
+}
+
+.circle.done {
+    background: #27ae60;
+}
+
+.circle.active {
+    background: #27ae60; /* same as done for completed */
+}
+/* LABEL */
+.label {
+    margin-top: 10px;
+    font-size: 0.85rem;
 }
 
 .hero-card {
@@ -557,14 +612,15 @@ td .btn {
     border-radius: var(--radius);
     padding: 1rem;
     display: grid;
-    grid-template-columns: auto auto 1fr;
+    grid-template-columns: auto auto auto;
     gap: .8rem;
+    flex-wrap: wrap; 
     margin-bottom: 1.4rem;
 }
 
 .filters {
     display: grid;
-    grid-template-columns: auto auto 1fr;
+    grid-template-columns: auto auto auto;
     gap: 0.8rem;
 }
 

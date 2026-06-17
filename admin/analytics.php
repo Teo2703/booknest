@@ -3,18 +3,28 @@ include '../app.php';
 requireAdmin();
 
 /* ======================
-   FILTER (7 / 30 DAYS)
+DATE FILTER
 ====================== */
+$from = $_GET['from'] ?? '';
+$to   = $_GET['to'] ?? '';
 $range = isset($_GET['range']) ? (int)$_GET['range'] : 7;
 
+$dateFilter = "";
+
+if (!empty($from) && !empty($to)) {
+    $dateFilter = " AND DATE(order_date) BETWEEN '$from' AND '$to'";
+} else {
+    $dateFilter = " AND order_date >= DATE_SUB(CURDATE(), INTERVAL $range DAY)";
+}
+
 /* ======================
-   SALES DATA
+SALES DATA
 ====================== */
 $salesQuery = $conn->query("
     SELECT DATE(order_date) as date, SUM(total_amount) as total
     FROM orders
     WHERE status = 'Completed'
-    AND order_date >= DATE_SUB(CURDATE(), INTERVAL $range DAY)
+    $dateFilter
     GROUP BY DATE(order_date)
     ORDER BY date ASC
 ");
@@ -28,17 +38,16 @@ while ($row = $salesQuery->fetch_assoc()) {
 }
 
 /* ======================
-   ANALYTICS CALCULATION
+ANALYTICS
 ====================== */
 $bestDay = "No Data";
 $worstDay = "No Data";
 $maxSales = 0;
 $minSales = 0;
 $avgSales = 0;
-$trend = "no";
+$trend = "none";
 
 if (!empty($totals)) {
-
     $maxSales = max($totals);
     $minSales = min($totals);
 
@@ -47,25 +56,20 @@ if (!empty($totals)) {
 
     $avgSales = array_sum($totals) / count($totals);
 
-    // TREND LOGIC 🔥
     if (count($totals) >= 2) {
-        if (end($totals) > $totals[0]) {
-            $trend = "up";
-        } elseif (end($totals) < $totals[0]) {
-            $trend = "down";
-        } else {
-            $trend = "stable";
-        }
+        if (end($totals) > $totals[0]) $trend = "up";
+        elseif (end($totals) < $totals[0]) $trend = "down";
+        else $trend = "stable";
     }
 }
 
 /* ======================
-   ORDER COUNT
+ORDERS COUNT
 ====================== */
 $orderQuery = $conn->query("
     SELECT DATE(order_date) as date, COUNT(*) as total_orders
     FROM orders
-    WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL $range DAY)
+    WHERE 1 $dateFilter
     GROUP BY DATE(order_date)
 ");
 
@@ -78,12 +82,24 @@ while ($row = $orderQuery->fetch_assoc()) {
 }
 
 /* ======================
-   SUMMARY
+SUMMARY
 ====================== */
 $totalRevenue = array_sum($totals);
 $totalOrdersCount = array_sum($orderCounts);
-?>
+$profit = $totalRevenue * 0.3;
 
+/* ======================
+TOP BOOKS 🔥
+====================== */
+$topBooks = $conn->query("
+    SELECT books.title, SUM(order_items.quantity) as total_sold
+    FROM order_items
+    LEFT JOIN books ON order_items.book_id = books.book_id
+    GROUP BY books.title
+    ORDER BY total_sold DESC
+    LIMIT 5
+");
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -120,113 +136,86 @@ $totalOrdersCount = array_sum($orderCounts);
     </div>
 </section>
 
-<!-- Main -->
 <main class="section">
 <div class="container admin-layout">
 
-<!-- Sidebar -->
-<aside class="sidebar">
-    <a href="admin-dashboard.php">Dashboard</a>
-    <a href="manage-books.php">Manage Books</a>
-    <a href="manage-orders.php">Manage Orders</a>
-    <a class="active" href="analytics.php">Analytics</a>
-    <a href="../index.php">Logout</a>
-</aside>
+            <aside class="sidebar">
+                <a href="admin-dashboard.php">Dashboard</a>
+                <a href="manage-books.php">Manage Books</a>
+                <a href="manage-orders.php">Manage Orders</a>
+                <a class="active" href="analytics.php">Analytics</a>
+                <a href="../auth/logout.php">Logout</a>
+            </aside>
 
-<!-- Content -->
 <section>
 
 <!-- FILTER -->
-<form method="GET" class="filters" style="margin-bottom:1rem;">
-    <select name="range" onchange="this.form.submit()">
-        <option value="7" <?php if($range==7) echo "selected"; ?>>Last 7 Days</option>
-        <option value="30" <?php if($range==30) echo "selected"; ?>>Last 30 Days</option>
-    </select>
+<form method="GET" class="filters">
+    <input type="date" name="from" value="<?php echo $from; ?>">
+    <input type="date" name="to" value="<?php echo $to; ?>">
+
+    <button class="btn secondary">Apply</button>
+
+    <a href="export-sales.php?from=<?php echo $from; ?>&to=<?php echo $to; ?>" class="btn export-btn">
+        ⬇ Export CSV
+    </a>
 </form>
 
-<!-- SUMMARY CARDS -->
+<!-- SUMMARY -->
 <div class="stat-grid">
-    <div class="stat">
-        💰 Total Revenue<br>
-        <strong>RM<?php echo number_format($totalRevenue,2); ?></strong>
-    </div>
-
-    <div class="stat">
-        📦 Total Orders<br>
-        <strong><?php echo $totalOrdersCount; ?></strong>
-    </div>
+    <div class="stat">💰 Revenue<br><strong>RM<?php echo number_format($totalRevenue,2); ?></strong></div>
+    <div class="stat">📦 Orders<br><strong><?php echo $totalOrdersCount; ?></strong></div>
+    <div class="stat">💸 Profit<br><strong>RM<?php echo number_format($profit,2); ?></strong></div>
 </div>
 
+<!-- INSIGHTS -->
 <div class="insight-card">
-    <h3>🧠 Sales Insights</h3>
-
-    <p>🔥 Best Day: <?php echo date("d M", strtotime($bestDay)); ?> 
-    (RM<?php echo number_format($maxSales,2); ?>)</p>
-
-    <p>📉 Lowest Day: <?php echo date("d M", strtotime($worstDay)); ?> 
-    (RM<?php echo number_format($minSales,2); ?>)</p>
-
-    <p>📊 Average Sales: RM<?php echo number_format($avgSales,2); ?></p>
-
-    <p>📈 Trend: 
-    <span class="trend <?php echo $trend; ?>">
-    <?php 
-    if ($trend == "up") echo "📈 ↑ Increasing";
-    elseif ($trend == "down") echo "📉 ↓ Decreasing";
-    elseif ($trend == "stable") echo "➡ Stable";
-    else echo "No Data";
-    ?>
-    </span>
+    <h3>🧠 Insights</h3>
+    <p>🔥 Best Day: <?php echo $bestDay; ?> (RM<?php echo number_format($maxSales,2); ?>)</p>
+    <p>📉 Worst Day: <?php echo $worstDay; ?> (RM<?php echo number_format($minSales,2); ?>)</p>
+    <p>📊 Avg Sales: RM<?php echo number_format($avgSales,2); ?></p>
+    <p>📈 Trend:
+        <?php
+        if ($trend=="up") echo "📈 Increasing";
+        elseif ($trend=="down") echo "📉 Decreasing";
+        else echo "➡ Stable";
+        ?>
     </p>
 </div>
 
-<!-- SALES CHART -->
+<!-- CHART -->
 <div class="chart-card">
     <h2>Sales Trend</h2>
     <canvas id="salesChart"></canvas>
 </div>
 
-<!-- ORDERS CHART -->
+<!-- TOP BOOKS -->
 <div class="chart-card">
-    <h2>Orders Count</h2>
-    <canvas id="orderChart"></canvas>
+    <h2>🔥 Top Selling Books</h2>
+    <?php while($b = $topBooks->fetch_assoc()): ?>
+        <div style="display:flex; justify-content:space-between;">
+            <span><?php echo $b['title']; ?></span>
+            <strong><?php echo $b['total_sold']; ?></strong>
+        </div>
+    <?php endwhile; ?>
 </div>
 
 </section>
 </div>
 </main>
 
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-// SALES CHART
-const salesCtx = document.getElementById('salesChart').getContext('2d');
-new Chart(salesCtx, {
+new Chart(document.getElementById('salesChart'), {
     type: 'line',
     data: {
         labels: <?php echo json_encode($dates); ?>,
         datasets: [{
-            label: 'Sales (RM)',
+            label: 'Sales',
             data: <?php echo json_encode($totals); ?>,
             borderColor: '#6b4f3b',
-            backgroundColor: 'rgba(107,79,59,0.1)',
-            fill: true,
-            tension: 0.4
-        }]
-    }
-});
-
-// ORDER CHART
-const orderCtx = document.getElementById('orderChart').getContext('2d');
-new Chart(orderCtx, {
-    type: 'bar',
-    data: {
-        labels: <?php echo json_encode($orderDates); ?>,
-        datasets: [{
-            label: 'Orders',
-            data: <?php echo json_encode($orderCounts); ?>,
-            backgroundColor: '#dfeeff'
+            fill: true
         }]
     }
 });

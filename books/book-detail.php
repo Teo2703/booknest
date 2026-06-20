@@ -17,6 +17,46 @@ if ($result->num_rows === 0) {
 }
 
 $book = $result->fetch_assoc();
+
+// Check if this customer purchased and completed an order with this book, and hasn't reviewed yet
+$canReview = false;
+$eligibleOrderId = 0;
+
+if (isCustomer()) {
+    $eligibleStmt = $conn->prepare("
+        SELECT order_items.order_id
+        FROM order_items
+        JOIN orders ON order_items.order_id = orders.order_id
+        LEFT JOIN reviews ON reviews.order_id = orders.order_id 
+            AND reviews.book_id = order_items.book_id 
+            AND reviews.user_id = orders.user_id
+        WHERE orders.user_id = ?
+          AND order_items.book_id = ?
+          AND orders.status = 'Completed'
+          AND reviews.review_id IS NULL
+        LIMIT 1
+    ");
+    $eligibleStmt->bind_param("ii", $_SESSION['user_id'], $book['book_id']);
+    $eligibleStmt->execute();
+    $eligible = $eligibleStmt->get_result()->fetch_assoc();
+
+    if ($eligible) {
+        $canReview = true;
+        $eligibleOrderId = (int)$eligible['order_id'];
+    }
+}
+
+// Get existing reviews for this book
+$reviewsStmt = $conn->prepare("
+    SELECT reviews.rating, reviews.comment, reviews.created_at, users.name
+    FROM reviews
+    JOIN users ON reviews.user_id = users.user_id
+    WHERE reviews.book_id = ?
+    ORDER BY reviews.created_at DESC
+");
+$reviewsStmt->bind_param("i", $book['book_id']);
+$reviewsStmt->execute();
+$bookReviews = $reviewsStmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -107,6 +147,69 @@ $book = $result->fetch_assoc();
             </div>
 
         </div>
+
+        <div class="container">
+            <div class="form-card" style="margin-top:1.5rem;">
+                <h2>Reviews</h2>
+
+                <?php if (isset($_GET['review_success'])): ?>
+                    <div class="notice">Thank you for your review!</div>
+                <?php endif; ?>
+
+                <?php if (isset($_GET['review_error'])): ?>
+                    <div class="notice">
+                        <?php
+                        if ($_GET['review_error'] === 'duplicate') echo "You've already reviewed this purchase.";
+                        elseif ($_GET['review_error'] === 'rating') echo "Please select a rating.";
+                        else echo "You can only review books you've purchased and received.";
+                        ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($canReview): ?>
+                    <form method="POST" action="submit-review.php" style="margin-bottom:1.5rem;">
+                        <input type="hidden" name="book_id" value="<?php echo $book['book_id']; ?>">
+                        <input type="hidden" name="order_id" value="<?php echo $eligibleOrderId; ?>">
+
+                        <div class="field">
+                            <label>Your Rating</label>
+                            <select name="rating" required>
+                                <option value="">Select rating</option>
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Good</option>
+                                <option value="3">3 - Average</option>
+                                <option value="2">2 - Poor</option>
+                                <option value="1">1 - Very Poor</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>Your Review</label>
+                            <textarea name="comment" rows="3" placeholder="Share your thoughts about this book"></textarea>
+                        </div>
+
+                        <button class="btn" type="submit">Submit Review</button>
+                    </form>
+                <?php elseif (!isLoggedIn()): ?>
+                    <p class="small">Login and purchase this book to leave a review.</p>
+                <?php elseif (isCustomer()): ?>
+                    <p class="small">You can review this book after your order is completed.</p>
+                <?php endif; ?>
+
+                <?php if ($bookReviews->num_rows === 0): ?>
+                    <p class="small">No reviews yet.</p>
+                <?php else: ?>
+                    <?php while ($r = $bookReviews->fetch_assoc()): ?>
+                        <div class="info-row" style="flex-direction:column; align-items:flex-start; gap:0.3rem;">
+                            <strong><?php echo str_repeat('★', (int)$r['rating']) . str_repeat('☆', 5 - (int)$r['rating']); ?></strong>
+                            <span><?php echo htmlspecialchars($r['comment']); ?></span>
+                            <span class="small">by <?php echo htmlspecialchars($r['name']); ?> on <?php echo date("d M Y", strtotime($r['created_at'])); ?></span>
+                        </div>
+                    <?php endwhile; ?>
+                <?php endif; ?>
+            </div>
+        </div>
+
     </main>
 
     <footer class="footer">

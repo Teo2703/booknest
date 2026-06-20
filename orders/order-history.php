@@ -33,6 +33,7 @@ while ($row = $orders->fetch_assoc()) {
 }
 
 $historyByOrder = [];
+$latestRefundByOrder = [];
 
 if (!empty($ordersList)) {
     $orderIds = array_column($ordersList, 'order_id');
@@ -60,6 +61,29 @@ if (!empty($ordersList)) {
 
     while ($history = $historyResult->fetch_assoc()) {
         $historyByOrder[(int)$history['order_id']][] = $history;
+    }
+
+    // Get the latest refund request per order, so we know if Pending/Rejected/Approved
+    $refundSql = "
+        SELECT refunds.order_id, refunds.status, refunds.requested_at
+        FROM refunds
+        INNER JOIN (
+            SELECT order_id, MAX(requested_at) AS latest_request
+            FROM refunds
+            WHERE order_id IN ($placeholders)
+            GROUP BY order_id
+        ) latest 
+            ON refunds.order_id = latest.order_id 
+            AND refunds.requested_at = latest.latest_request
+    ";
+
+    $refundStmt = $conn->prepare($refundSql);
+    $refundStmt->bind_param($types, ...$orderIds);
+    $refundStmt->execute();
+    $refundResult = $refundStmt->get_result();
+
+    while ($refundRow = $refundResult->fetch_assoc()) {
+        $latestRefundByOrder[(int)$refundRow['order_id']] = $refundRow['status'];
     }
 }
 ?>
@@ -99,6 +123,33 @@ if (!empty($ordersList)) {
             </div>
         <?php endif; ?>
 
+        <?php if (isset($_GET['cancelled'])): ?>
+            <div class="notice" style="margin-bottom:1rem;">
+                Order #BN<?php echo str_pad((int)$_GET['cancelled'], 4, '0', STR_PAD_LEFT); ?> has been cancelled.
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['refund_requested'])): ?>
+            <div class="notice" style="margin-bottom:1rem;">
+                Refund request submitted for order #BN<?php echo str_pad((int)$_GET['refund_requested'], 4, '0', STR_PAD_LEFT); ?>. We'll review it shortly.
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['cancel_error'])): ?>
+            <div class="notice" style="margin-bottom:1rem;">
+                This order can no longer be cancelled.
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['refund_error'])): ?>
+            <div class="notice" style="margin-bottom:1rem;">
+                <?php
+                if ($_GET['refund_error'] === 'already_requested') echo "A refund has already been requested for this order.";
+                else echo "This order is not eligible for a refund.";
+                ?>
+            </div>
+        <?php endif; ?>
+
         <div class="table-wrap">
             <?php if (empty($ordersList)): ?>
                 <div class="notice">
@@ -124,6 +175,8 @@ if (!empty($ordersList)) {
                                 if (!empty($order['item_list'])) {
                                     $items = explode('||', $order['item_list']);
                                 }
+                                $orderIdInt = (int)$order['order_id'];
+                                $latestRefundStatus = $latestRefundByOrder[$orderIdInt] ?? null;
                             ?>
                             <tr>
                                 <td>#BN<?php echo str_pad($order['order_id'], 4, '0', STR_PAD_LEFT); ?></td>
@@ -148,10 +201,28 @@ if (!empty($ordersList)) {
                                     <button 
                                         type="button" 
                                         class="btn secondary track-btn" 
-                                        data-modal-target="track-modal-<?php echo (int)$order['order_id']; ?>"
+                                        data-modal-target="track-modal-<?php echo $orderIdInt; ?>"
                                     >
                                         Track
                                     </button>
+
+                                    <?php if (in_array($order['status'], ['Pending', 'Processing'])): ?>
+                                        <a class="btn danger" href="cancel-order.php?id=<?php echo $orderIdInt; ?>"
+                                           onclick="return confirm('Cancel this order?')">Cancel</a>
+                                    <?php endif; ?>
+
+                                    <?php if ($order['status'] === 'Refunded'): ?>
+                                        <span class="small">Refunded</span>
+
+                                    <?php elseif ($latestRefundStatus === 'Pending'): ?>
+                                        <span class="small">Refund Pending</span>
+
+                                    <?php elseif ($latestRefundStatus === 'Rejected'): ?>
+                                        <span class="small">Refund Rejected</span>
+
+                                    <?php elseif ($order['status'] === 'Completed'): ?>
+                                        <a class="btn secondary" href="request-refund.php?id=<?php echo $orderIdInt; ?>">Refund</a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

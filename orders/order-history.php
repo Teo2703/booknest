@@ -6,19 +6,10 @@ $user_id = (int)$_SESSION['user_id'];
 $placedOrderId = isset($_GET['placed']) ? (int)$_GET['placed'] : 0;
 
 $sql = "
-    SELECT 
-        orders.order_id,
-        orders.order_date,
-        orders.total_amount,
-        orders.status,
-        COALESCE(SUM(order_items.quantity), 0) AS item_count,
-        GROUP_CONCAT(CONCAT(books.title, ' x ', order_items.quantity) ORDER BY books.title SEPARATOR '||') AS item_list
+    SELECT order_id, order_date, total_amount, status
     FROM orders
-    LEFT JOIN order_items ON orders.order_id = order_items.order_id
-    LEFT JOIN books ON order_items.book_id = books.book_id
-    WHERE orders.user_id = ?
-    GROUP BY orders.order_id, orders.order_date, orders.total_amount, orders.status
-    ORDER BY orders.order_date DESC
+    WHERE user_id = ?
+    ORDER BY order_date DESC
 ";
 
 $stmt = $conn->prepare($sql);
@@ -39,6 +30,8 @@ while ($row = $orders->fetch_assoc()) {
 
 $historyByOrder = [];
 $latestRefundByOrder = [];
+$itemsByOrder = [];
+$reviewedBooks = [];
 
 if (!empty($ordersList)) {
     $orderIds = array_column($ordersList, 'order_id');
@@ -92,6 +85,37 @@ if (!empty($ordersList)) {
         while ($refundRow = $refundResult->fetch_assoc()) {
             $latestRefundByOrder[(int)$refundRow['order_id']] = $refundRow['status'];
         }
+    }
+
+    // Fetch order items individually (with book_id) so we can link to each book's review form
+    $itemsSql = "
+        SELECT order_items.order_id, order_items.book_id, order_items.quantity, books.title
+        FROM order_items
+        JOIN books ON order_items.book_id = books.book_id
+        WHERE order_items.order_id IN ($placeholders)
+        ORDER BY books.title
+    ";
+
+    $itemsStmt = $conn->prepare($itemsSql);
+    $itemsStmt->bind_param($types, ...$orderIds);
+    $itemsStmt->execute();
+    $itemsResult = $itemsStmt->get_result();
+
+    while ($itemRow = $itemsResult->fetch_assoc()) {
+        $itemsByOrder[(int)$itemRow['order_id']][] = $itemRow;
+    }
+
+    // Find which books in these orders already have a review, so we don't prompt twice
+    $reviewSql = "
+        SELECT order_id, book_id FROM reviews WHERE order_id IN ($placeholders)
+    ";
+    $reviewStmt = $conn->prepare($reviewSql);
+    $reviewStmt->bind_param($types, ...$orderIds);
+    $reviewStmt->execute();
+    $reviewResult = $reviewStmt->get_result();
+
+    while ($reviewRow = $reviewResult->fetch_assoc()) {
+        $reviewedBooks[(int)$reviewRow['order_id']][(int)$reviewRow['book_id']] = true;
     }
 }
 ?>
@@ -232,12 +256,11 @@ if (!empty($ordersList)) {
                         <?php foreach ($ordersList as $order): ?>
                             <?php
                                 $items = [];
-
                                 if (!empty($order['item_list'])) {
                                     $items = explode('||', $order['item_list']);
                                 }
-
                                 $orderIdInt = (int)$order['order_id'];
+                                $orderItems = $itemsByOrder[$orderIdInt] ?? [];
                                 $latestRefundStatus = $latestRefundByOrder[$orderIdInt] ?? null;
 
                                 $displayStatus = $order['status'];
@@ -263,16 +286,27 @@ if (!empty($ordersList)) {
                                 </td>
 
                                 <td>
-                                    <?php if (empty($items)): ?>
+                                    <?php if (empty($orderItems)): ?>
                                         <span class="small">No item details available</span>
                                     <?php else: ?>
-                                        <?php foreach ($items as $item): ?>
-                                            <?php echo htmlspecialchars($item); ?><br>
-                                        <?php endforeach; ?>
+                                        <?php foreach ($orderItems as $item): ?>
+                                            <?php $alreadyReviewed = isset($reviewedBooks[$orderIdInt][$item['book_id']]); ?>
+                                            <div style="margin-bottom:0.3rem;">
+                                                <?php echo htmlspecialchars($item['title']); ?> x <?php echo (int)$item['quantity']; ?>
 
-                                        <span class="small">
-                                            Total items: <?php echo (int)$order['item_count']; ?>
-                                        </span>
+                                                <?php if ($order['status'] === 'Completed'): ?>
+                                                    <?php if ($alreadyReviewed): ?>
+                                                        <span class="small" style="color:#1d9e75;">Reviewed</span>
+                                                    <?php else: ?>
+                                                        <a class="small" style="color:#7b4b2a;font-weight:700;"
+                                                           href="../books/book-detail.php?id=<?php echo $item['book_id']; ?>#reviews">
+                                                            Rate this book
+                                                        </a>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        <span class="small">Total items: <?php echo (int)$order['item_count']; ?></span>
                                     <?php endif; ?>
                                 </td>
 
@@ -363,14 +397,14 @@ if (!empty($ordersList)) {
                                 </div>
                             </div>
 
-                            <div class="timeline">
+                            <div class="tracking-timeline">
                                 <?php if (empty($trackingHistory)): ?>
                                     <div class="notice">
                                         No tracking history available.
                                     </div>
                                 <?php else: ?>
                                     <?php foreach ($trackingHistory as $history): ?>
-                                        <div class="timeline-item <?php echo strtolower(str_replace(' ', '-', trim($history['status']))); ?>">
+                                        <div class="timeline-step <?php echo strtolower(str_replace(' ', '-', trim($history['status']))); ?>">
                                             <div class="timeline-dot"></div>
 
                                             <div class="timeline-content">

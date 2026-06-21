@@ -22,6 +22,11 @@ $sql = "
 ";
 
 $stmt = $conn->prepare($sql);
+
+if (!$stmt) {
+    die("Database prepare failed: " . $conn->error);
+}
+
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $orders = $stmt->get_result();
@@ -55,15 +60,17 @@ if (!empty($ordersList)) {
     ";
 
     $historyStmt = $conn->prepare($historySql);
-    $historyStmt->bind_param($types, ...$orderIds);
-    $historyStmt->execute();
-    $historyResult = $historyStmt->get_result();
 
-    while ($history = $historyResult->fetch_assoc()) {
-        $historyByOrder[(int)$history['order_id']][] = $history;
+    if ($historyStmt) {
+        $historyStmt->bind_param($types, ...$orderIds);
+        $historyStmt->execute();
+        $historyResult = $historyStmt->get_result();
+
+        while ($history = $historyResult->fetch_assoc()) {
+            $historyByOrder[(int)$history['order_id']][] = $history;
+        }
     }
 
-    // Get the latest refund request per order (by refund_id, not timestamp)
     $refundSql = "
         SELECT r.order_id, r.status
         FROM refunds r
@@ -76,12 +83,15 @@ if (!empty($ordersList)) {
     ";
 
     $refundStmt = $conn->prepare($refundSql);
-    $refundStmt->bind_param($types, ...$orderIds);
-    $refundStmt->execute();
-    $refundResult = $refundStmt->get_result();
 
-    while ($refundRow = $refundResult->fetch_assoc()) {
-        $latestRefundByOrder[(int)$refundRow['order_id']] = $refundRow['status'];
+    if ($refundStmt) {
+        $refundStmt->bind_param($types, ...$orderIds);
+        $refundStmt->execute();
+        $refundResult = $refundStmt->get_result();
+
+        while ($refundRow = $refundResult->fetch_assoc()) {
+            $latestRefundByOrder[(int)$refundRow['order_id']] = $refundRow['status'];
+        }
     }
 }
 ?>
@@ -92,8 +102,49 @@ if (!empty($ordersList)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css?v=124">
+    <link rel="stylesheet" href="../css/style.css?v=151">
+
+    <style>
+        .order-action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .order-action-buttons .btn,
+        .receipt-btn {
+            width: 100%;
+            min-width: 110px;
+            padding: 0.55rem 0.75rem;
+            font-size: 0.9rem;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .receipt-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .order-history-table th,
+        .order-history-table td {
+            vertical-align: top;
+        }
+
+        @media (max-width: 900px) {
+            .table-wrap {
+                overflow-x: auto;
+            }
+
+            .order-action-buttons {
+                min-width: 120px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
 <div class="topbar">
@@ -109,12 +160,13 @@ if (!empty($ordersList)) {
     <div class="container">
         <p class="eyebrow">Customer Orders</p>
         <h1>Order History</h1>
-        <p>View your previous orders, ordered items, total amount, and current order status.</p>
+        <p>View your previous orders, ordered items, total amount, current order status, and receipt.</p>
     </div>
 </section>
 
 <main class="section">
     <div class="container">
+
         <?php if ($placedOrderId > 0): ?>
             <div class="notice" style="margin-bottom:1rem;">
                 Order #BN<?php echo str_pad($placedOrderId, 4, '0', STR_PAD_LEFT); ?> placed successfully.
@@ -142,20 +194,28 @@ if (!empty($ordersList)) {
         <?php if (isset($_GET['refund_error'])): ?>
             <div class="notice" style="margin-bottom:1rem;">
                 <?php
-                if ($_GET['refund_error'] === 'already_requested') echo "A refund has already been requested for this order.";
-                else echo "This order is not eligible for a refund.";
+                if ($_GET['refund_error'] === 'already_requested') {
+                    echo "A refund has already been requested for this order.";
+                } else {
+                    echo "This order is not eligible for a refund.";
+                }
                 ?>
             </div>
         <?php endif; ?>
 
         <div class="table-wrap">
             <?php if (empty($ordersList)): ?>
+
                 <div class="notice">
                     You have not placed any orders yet.
-                    <a href="../books/books.php" style="font-weight:700;color:#7b4b2a;">Browse books now</a>.
+                    <a href="../books/books.php" style="font-weight:700;color:#7b4b2a;">
+                        Browse books now
+                    </a>.
                 </div>
+
             <?php else: ?>
-                <table>
+
+                <table class="order-history-table">
                     <thead>
                         <tr>
                             <th>Order ID</th>
@@ -164,20 +224,24 @@ if (!empty($ordersList)) {
                             <th>Total</th>
                             <th>Status</th>
                             <th>Tracking</th>
+                            <th>Receipt</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <?php foreach ($ordersList as $order): ?>
                             <?php
                                 $items = [];
+
                                 if (!empty($order['item_list'])) {
                                     $items = explode('||', $order['item_list']);
                                 }
+
                                 $orderIdInt = (int)$order['order_id'];
                                 $latestRefundStatus = $latestRefundByOrder[$orderIdInt] ?? null;
 
-                                // Decide what the Status badge should display
                                 $displayStatus = $order['status'];
+
                                 if ($order['status'] === 'Completed') {
                                     if ($latestRefundStatus === 'Pending') {
                                         $displayStatus = 'Refund Pending';
@@ -185,11 +249,19 @@ if (!empty($ordersList)) {
                                         $displayStatus = 'Refund Rejected';
                                     }
                                 }
+
                                 $displayStatusClass = strtolower(str_replace(' ', '-', trim($displayStatus)));
                             ?>
+
                             <tr>
-                                <td>#BN<?php echo str_pad($order['order_id'], 4, '0', STR_PAD_LEFT); ?></td>
-                                <td><?php echo date("d M Y", strtotime($order['order_date'])); ?></td>
+                                <td>
+                                    #BN<?php echo str_pad($order['order_id'], 4, '0', STR_PAD_LEFT); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo date("d M Y", strtotime($order['order_date'])); ?>
+                                </td>
+
                                 <td>
                                     <?php if (empty($items)): ?>
                                         <span class="small">No item details available</span>
@@ -197,39 +269,68 @@ if (!empty($ordersList)) {
                                         <?php foreach ($items as $item): ?>
                                             <?php echo htmlspecialchars($item); ?><br>
                                         <?php endforeach; ?>
-                                        <span class="small">Total items: <?php echo (int)$order['item_count']; ?></span>
+
+                                        <span class="small">
+                                            Total items: <?php echo (int)$order['item_count']; ?>
+                                        </span>
                                     <?php endif; ?>
                                 </td>
-                                <td>RM<?php echo number_format($order['total_amount'], 2); ?></td>
+
                                 <td>
-                                    <span class="status <?php echo $displayStatusClass; ?>">
+                                    RM<?php echo number_format($order['total_amount'], 2); ?>
+                                </td>
+
+                                <td>
+                                    <span class="status <?php echo htmlspecialchars($displayStatusClass); ?>">
                                         <?php echo htmlspecialchars($displayStatus); ?>
                                     </span>
                                 </td>
+
                                 <td>
-                                    <button 
-                                        type="button" 
-                                        class="btn secondary track-btn" 
-                                        data-modal-target="track-modal-<?php echo $orderIdInt; ?>"
+                                    <div class="order-action-buttons">
+                                        <button 
+                                            type="button" 
+                                            class="btn secondary track-btn" 
+                                            data-modal-target="track-modal-<?php echo $orderIdInt; ?>"
+                                        >
+                                            Track
+                                        </button>
+
+                                        <?php if (in_array($order['status'], ['Pending', 'Processing'])): ?>
+                                            <a 
+                                                class="btn danger" 
+                                                href="cancel-order.php?id=<?php echo $orderIdInt; ?>"
+                                                onclick="return confirm('Cancel this order?')"
+                                            >
+                                                Cancel
+                                            </a>
+                                        <?php endif; ?>
+
+                                        <?php if ($order['status'] === 'Completed'): ?>
+                                            <a 
+                                                class="btn secondary" 
+                                                href="request-refund.php?id=<?php echo $orderIdInt; ?>"
+                                            >
+                                                <?php echo $latestRefundStatus === 'Rejected' ? 'Request Again' : 'Refund'; ?>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <a 
+                                        class="btn secondary receipt-btn" 
+                                        href="receipt.php?order_id=<?php echo $orderIdInt; ?>"
                                     >
-                                        Track
-                                    </button>
-
-                                    <?php if (in_array($order['status'], ['Pending', 'Processing'])): ?>
-                                        <a class="btn danger" href="cancel-order.php?id=<?php echo $orderIdInt; ?>"
-                                           onclick="return confirm('Cancel this order?')">Cancel</a>
-                                    <?php endif; ?>
-
-                                    <?php if ($order['status'] === 'Completed'): ?>
-                                        <a class="btn secondary" href="request-refund.php?id=<?php echo $orderIdInt; ?>">
-                                            <?php echo $latestRefundStatus === 'Rejected' ? 'Request Again' : 'Refund'; ?>
-                                        </a>
-                                    <?php endif; ?>
+                                        View Receipt
+                                    </a>
                                 </td>
                             </tr>
+
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
                 <?php foreach ($ordersList as $order): ?>
                     <?php 
                         $orderId = (int)$order['order_id'];
@@ -248,13 +349,15 @@ if (!empty($ordersList)) {
                                     <strong>Date</strong>
                                     <span><?php echo date("d M Y", strtotime($order['order_date'])); ?></span>
                                 </div>
+
                                 <div>
                                     <strong>Total</strong>
                                     <span>RM<?php echo number_format($order['total_amount'], 2); ?></span>
                                 </div>
+
                                 <div>
                                     <strong>Current Status</strong>
-                                    <span class="status <?php echo strtolower(trim($order['status'])); ?>">
+                                    <span class="status <?php echo strtolower(str_replace(' ', '-', trim($order['status']))); ?>">
                                         <?php echo htmlspecialchars($order['status']); ?>
                                     </span>
                                 </div>
@@ -262,7 +365,9 @@ if (!empty($ordersList)) {
 
                             <div class="timeline">
                                 <?php if (empty($trackingHistory)): ?>
-                                    <div class="notice">No tracking history available.</div>
+                                    <div class="notice">
+                                        No tracking history available.
+                                    </div>
                                 <?php else: ?>
                                     <?php foreach ($trackingHistory as $history): ?>
                                         <div class="timeline-item <?php echo strtolower(str_replace(' ', '-', trim($history['status']))); ?>">
@@ -270,10 +375,15 @@ if (!empty($ordersList)) {
 
                                             <div class="timeline-content">
                                                 <strong><?php echo htmlspecialchars($history['status']); ?></strong>
-                                                <p><?php echo date("d M Y, h:i A", strtotime($history['changed_at'])); ?></p>
+
+                                                <p>
+                                                    <?php echo date("d M Y, h:i A", strtotime($history['changed_at'])); ?>
+                                                </p>
 
                                                 <?php if (!empty($history['note'])): ?>
-                                                    <span class="small"><?php echo htmlspecialchars($history['note']); ?></span>
+                                                    <span class="small">
+                                                        <?php echo htmlspecialchars($history['note']); ?>
+                                                    </span>
                                                 <?php endif; ?>
 
                                                 <span class="small">
@@ -288,6 +398,7 @@ if (!empty($ordersList)) {
                         </div>
                     </div>
                 <?php endforeach; ?>
+
             <?php endif; ?>
         </div>
     </div>
@@ -295,24 +406,30 @@ if (!empty($ordersList)) {
 
 <footer class="footer">
     <div class="container footer-grid">
+
         <div>
             <h3>BookNest</h3>
             <p>Mini Online Bookstore e-commerce system.</p>
         </div>
+
         <div>
             <h4>Customer</h4>
             <a href="../books/books.php">Browse Books</a>
             <a href="cart.php">Shopping Cart</a>
             <a href="checkout.php">Checkout</a>
+            <a href="order-history.php">Order History</a>
         </div>
+
         <div>
             <h4>Admin</h4>
             <a href="../admin/admin-dashboard.php">Dashboard</a>
             <a href="../admin/manage-books.php">Manage Books</a>
             <a href="../admin/manage-orders.php">Manage Orders</a>
         </div>
+
     </div>
 </footer>
+
 <script>
 document.querySelectorAll('[data-modal-target]').forEach(function(button) {
     button.addEventListener('click', function() {
@@ -327,7 +444,11 @@ document.querySelectorAll('[data-modal-target]').forEach(function(button) {
 
 document.querySelectorAll('[data-modal-close]').forEach(function(button) {
     button.addEventListener('click', function() {
-        button.closest('.modal-overlay').classList.remove('show');
+        const modal = button.closest('.modal-overlay');
+
+        if (modal) {
+            modal.classList.remove('show');
+        }
     });
 });
 
@@ -347,5 +468,6 @@ document.addEventListener('keydown', function(event) {
     }
 });
 </script>
+
 </body>
 </html>

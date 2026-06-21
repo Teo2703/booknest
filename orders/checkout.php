@@ -7,7 +7,6 @@ if (!isset($_SESSION['cart'])) {
 }
 
 $errors = [];
-$success = '';
 
 function getCartItemsForCheckout($conn) {
     $items = [];
@@ -21,7 +20,16 @@ function getCartItemsForCheckout($conn) {
     $placeholders = implode(',', array_fill(0, count($bookIds), '?'));
     $types = str_repeat('i', count($bookIds));
 
-    $stmt = $conn->prepare("SELECT book_id, title, author, category, price, stock FROM books WHERE book_id IN ($placeholders)");
+    $stmt = $conn->prepare("
+        SELECT book_id, title, author, category, price, stock 
+        FROM books 
+        WHERE book_id IN ($placeholders)
+    ");
+
+    if (!$stmt) {
+        die("Database prepare failed: " . $conn->error);
+    }
+
     $stmt->bind_param($types, ...$bookIds);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -47,32 +55,115 @@ function getCartItemsForCheckout($conn) {
     return [$items, $subtotal];
 }
 
-function orderColumnExists($conn, $columnName) {
-    $sql = "
-        SELECT COUNT(*) AS total
-        FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_SCHEMA = DATABASE() 
-        AND TABLE_NAME = 'orders' 
-        AND COLUMN_NAME = ?
-    ";
+function createOrder($conn, $cartItems, $total, $name, $contact, $email, $address, $payment_method, $payment_status = 'Pending', $payment_reference = null, $card_last_four = null) {
+    $user_id = (int)$_SESSION['user_id'];
 
-    $stmt = $conn->prepare($sql);
+    $conn->begin_transaction();
 
+    try {
+        $paid_at = null;
 
-    if (!$stmt) {
-        die("Database prepare failed: " . $conn->error);
+        if ($payment_status === 'Paid') {
+            $paid_at = date('Y-m-d H:i:s');
+        }
+
+        $stmt = $conn->prepare("
+            INSERT INTO orders 
+            (
+                user_id, 
+                total_amount, 
+                status, 
+                delivery_name, 
+                delivery_contact, 
+                delivery_email, 
+                delivery_address, 
+                payment_method, 
+                payment_status, 
+                payment_reference, 
+                card_last_four, 
+                paid_at
+            ) 
+            VALUES 
+            (?, ?, 'Pending', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
+        if (!$stmt) {
+            throw new Exception("Order insert prepare failed: " . $conn->error);
+        }
+
+        $stmt->bind_param(
+            "idsssssssss",
+            $user_id,
+            $total,
+            $name,
+            $contact,
+            $email,
+            $address,
+            $payment_method,
+            $payment_status,
+            $payment_reference,
+            $card_last_four,
+            $paid_at
+        );
+
+        $stmt->execute();
+        $order_id = $conn->insert_id;
+
+        $itemStmt = $conn->prepare("
+            INSERT INTO order_items 
+            (order_id, book_id, quantity, price) 
+            VALUES (?, ?, ?, ?)
+        ");
+
+        if (!$itemStmt) {
+            throw new Exception("Order item insert prepare failed: " . $conn->error);
+        }
+
+        $stockStmt = $conn->prepare("
+            UPDATE books 
+            SET stock = stock - ? 
+            WHERE book_id = ? AND stock >= ?
+        ");
+
+        if (!$stockStmt) {
+            throw new Exception("Stock update prepare failed: " . $conn->error);
+        }
+
+        foreach ($cartItems as $item) {
+            $book_id = (int)$item['book']['book_id'];
+            $quantity = (int)$item['quantity'];
+            $price = (float)$item['book']['price'];
+
+            if ($quantity > (int)$item['book']['stock']) {
+                throw new Exception("Not enough stock for " . $item['book']['title']);
+            }
+
+            $itemStmt->bind_param("iiid", $order_id, $book_id, $quantity, $price);
+            $itemStmt->execute();
+
+            $stockStmt->bind_param("iii", $quantity, $book_id, $quantity);
+            $stockStmt->execute();
+
+            if ($stockStmt->affected_rows === 0) {
+                throw new Exception("Stock update failed for " . $item['book']['title']);
+            }
+        }
+
+        $conn->commit();
+
+        $_SESSION['cart'] = [];
+        unset($_SESSION['checkout_data']);
+
+        return $order_id;
+
+    } catch (Exception $e) {
+        $conn->rollback();
+        throw $e;
     }
-
-    $stmt->bind_param("s", $columnName);
-    $stmt->execute();
-    
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-
-    return (int)$row['total'] > 0;
 }
 
 list($cartItems, $subtotal) = getCartItemsForCheckout($conn);
+
 $delivery = $subtotal >= 80 || $subtotal == 0 ? 0 : 5;
 $total = $subtotal + $delivery;
 
@@ -107,98 +198,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Delivery address is required.";
     }
 
-    if (!in_array($payment_method, ['Cash on Delivery', 'Online Transfer'])) {
-        $errors[] = "Invalid payment method.";
-    }
-
-    list($cartItems, $subtotal) = getCartItemsForCheckout($conn);
-    $delivery = $subtotal >= 80 || $subtotal == 0 ? 0 : 5;
-    $total = $subtotal + $delivery;
-
     if (empty($cartItems)) {
         $errors[] = "Your cart is empty.";
     }
 
+    $allowedPayments = ['Cash on Delivery', 'Online Transfer', 'Credit/Debit Card'];
+
+    if (!in_array($payment_method, $allowedPayments)) {
+        $errors[] = "Invalid payment method selected.";
+    }
+
     foreach ($cartItems as $item) {
-        $book = $item['book'];
-        if ((int)$item['quantity'] > (int)$book['stock']) {
-            $errors[] = htmlspecialchars($book['title']) . " does not have enough stock.";
+        if ((int)$item['quantity'] > (int)$item['book']['stock']) {
+            $errors[] = $item['book']['title'] . " does not have enough stock.";
         }
     }
 
     if (empty($errors)) {
-        try {
-            $conn->begin_transaction();
+        if ($payment_method === 'Cash on Delivery') {
+            try {
+                $order_id = createOrder(
+                    $conn,
+                    $cartItems,
+                    $total,
+                    $name,
+                    $contact,
+                    $email,
+                    $address,
+                    $payment_method,
+                    'Pending',
+                    null,
+                    null
+                );
 
-            $columns = ['user_id', 'total_amount', 'status'];
-            $placeholders = ['?', '?', '?'];
-            $types = 'ids';
-            $values = [(int)$_SESSION['user_id'], (float)$total, 'Pending'];
+                header("Location: receipt.php?order_id=" . $order_id);
+                exit();
 
-            // These columns are included in the updated SQL file. The checks keep the page usable even if the old SQL was imported.
-            $optionalColumns = [
-                'delivery_name' => [$name, 's'],
-                'delivery_contact' => [$contact, 's'],
-                'delivery_email' => [$email, 's'],
-                'delivery_address' => [$address, 's'],
-                'payment_method' => [$payment_method, 's']
+            } catch (Exception $e) {
+                $errors[] = "Order could not be placed. " . $e->getMessage();
+            }
+        } else {
+            $_SESSION['checkout_data'] = [
+                'name' => $name,
+                'contact' => $contact,
+                'email' => $email,
+                'address' => $address,
+                'payment_method' => $payment_method,
+                'subtotal' => $subtotal,
+                'delivery' => $delivery,
+                'total' => $total
             ];
 
-            foreach ($optionalColumns as $column => $data) {
-                if (orderColumnExists($conn, $column)) {
-                    $columns[] = $column;
-                    $placeholders[] = '?';
-                    $types .= $data[1];
-                    $values[] = $data[0];
-                }
-            }
-
-            $sql = "INSERT INTO orders (" . implode(',', $columns) . ") VALUES (" . implode(',', $placeholders) . ")";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param($types, ...$values);
-            $stmt->execute();
-            $order_id = $conn->insert_id;
-
-            $historyStmt = $conn->prepare("
-                INSERT INTO order_status_history (order_id, status, changed_by_user_id, note)
-                VALUES (?, ?, ?, ?)
-            ");
-
-            $initialStatus = 'Pending';
-            $customerId = (int)$_SESSION['user_id'];
-            $historyNote = 'Order placed by customer';
-
-            $historyStmt->bind_param("isis", $order_id, $initialStatus, $customerId, $historyNote);
-            $historyStmt->execute();
-
-            $itemStmt = $conn->prepare("INSERT INTO order_items (order_id, book_id, quantity, price) VALUES (?, ?, ?, ?)");
-            $stockStmt = $conn->prepare("UPDATE books SET stock = stock - ? WHERE book_id = ? AND stock >= ?");
-
-            foreach ($cartItems as $item) {
-                $book = $item['book'];
-                $book_id = (int)$book['book_id'];
-                $quantity = (int)$item['quantity'];
-                $price = (float)$book['price'];
-
-                $itemStmt->bind_param("iiid", $order_id, $book_id, $quantity, $price);
-                $itemStmt->execute();
-
-                $stockStmt->bind_param("iii", $quantity, $book_id, $quantity);
-                $stockStmt->execute();
-
-                if ($stockStmt->affected_rows !== 1) {
-                    throw new Exception("Stock update failed for " . $book['title']);
-                }
-            }
-
-            $conn->commit();
-            $_SESSION['cart'] = [];
-
-            header("Location: order-history.php?placed=" . $order_id);
+            header("Location: payment.php");
             exit();
-        } catch (Exception $e) {
-            $conn->rollback();
-            $errors[] = "Order could not be placed. Please try again.";
         }
     }
 }
@@ -210,8 +262,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css?v=123">
+    <link rel="stylesheet" href="../css/style.css?v=140">
 </head>
+
 <body>
 
 <div class="topbar">
@@ -221,112 +274,188 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<?php include __DIR__ . '/../includes/navigation.php'; ?>
+<header class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="../index.php">Book<span>Nest</span></a>
+
+        <nav class="nav-links">
+            <a href="../index.php">Home</a>
+            <a href="../books/books.php">Books</a>
+            <a href="cart.php">Cart</a>
+            <a href="order-history.php">Orders</a>
+            <a href="../auth/logout.php">
+                👤 <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Customer'); ?> | Logout
+            </a>
+        </nav>
+    </div>
+</header>
 
 <section class="page-title">
     <div class="container">
         <p class="eyebrow">Checkout</p>
-        <h1>Confirm Your Order</h1>
-        <p>Enter delivery details and confirm selected books.</p>
+        <h1>Complete Your Order</h1>
+        <p>Enter your delivery details and choose your payment method.</p>
     </div>
 </section>
 
 <main class="section">
     <div class="container two-col">
-        <form id="checkoutForm" class="form-card" method="POST" action="checkout.php" novalidate>
-            <h2>Delivery Information</h2>
 
-            <?php if (!empty($errors)): ?>
-                <div class="notice" style="margin-bottom:1rem;">
-                    <?php foreach ($errors as $error): ?>
-                        <p><?php echo htmlspecialchars($error); ?></p>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
+        <div>
+            <form class="form-card" method="POST" action="checkout.php">
+                <h2>Delivery Information</h2>
 
-            <?php if (empty($cartItems)): ?>
-                <div class="notice" style="margin-bottom:1rem;">
-                    Your cart is empty. Please add books before checkout.
-                </div>
-                <a class="btn" href="../books/books.php">Browse Books</a>
-            <?php else: ?>
-                <div class="form-grid">
+                <?php if (!empty($errors)): ?>
+                    <div class="notice" style="margin-bottom:1rem;">
+                        <?php foreach ($errors as $error): ?>
+                            <p><?php echo htmlspecialchars($error); ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (empty($cartItems)): ?>
+                    <div class="notice">
+                        Your cart is empty. Please add books before checkout.
+                    </div>
+
+                    <a class="btn" href="../books/books.php">
+                        Browse Books
+                    </a>
+                <?php else: ?>
+
                     <div class="field">
                         <label>Full Name</label>
-                        <input class="input" name="name" value="<?php echo htmlspecialchars($name); ?>" placeholder="Enter full name">
+                        <input 
+                            class="input" 
+                            type="text" 
+                            name="name" 
+                            value="<?php echo htmlspecialchars($name); ?>" 
+                            required
+                        >
                     </div>
+
                     <div class="field">
                         <label>Contact Number</label>
-                        <input class="input" name="contact" value="<?php echo htmlspecialchars($contact); ?>" placeholder="Enter phone number">
+                        <input 
+                            class="input" 
+                            type="text" 
+                            name="contact" 
+                            value="<?php echo htmlspecialchars($contact); ?>" 
+                            required
+                        >
                     </div>
-                </div>
 
-                <div class="field">
-                    <label>Email</label>
-                    <input class="input" type="email" name="email" value="<?php echo htmlspecialchars($email); ?>" placeholder="Enter email">
-                </div>
+                    <div class="field">
+                        <label>Email</label>
+                        <input 
+                            class="input" 
+                            type="email" 
+                            name="email" 
+                            value="<?php echo htmlspecialchars($email); ?>" 
+                            required
+                        >
+                    </div>
 
-                <div class="field">
-                    <label>Delivery Address</label>
-                    <textarea name="address" rows="4" placeholder="Enter delivery address"><?php echo htmlspecialchars($address); ?></textarea>
-                </div>
+                    <div class="field">
+                        <label>Delivery Address</label>
+                        <textarea name="address" rows="4" required><?php echo htmlspecialchars($address); ?></textarea>
+                    </div>
 
-                <div class="field">
-                    <label>Payment Method</label>
-                    <select name="payment_method">
-                        <option value="">Select payment method</option>
-                        <option <?php if ($payment_method === 'Cash on Delivery') echo 'selected'; ?>>Cash on Delivery</option>
-                        <option <?php if ($payment_method === 'Online Transfer') echo 'selected'; ?>>Online Transfer</option>
-                    </select>
-                </div>
+                    <div class="field">
+                        <label>Payment Method</label>
+                        <select name="payment_method" required>
+                            <option value="Cash on Delivery" <?php echo $payment_method === 'Cash on Delivery' ? 'selected' : ''; ?>>
+                                Cash on Delivery
+                            </option>
 
-                <button class="btn" type="submit">Place Order</button>
-                <a class="btn secondary" style="width:auto;margin-left:.5rem;" href="cart.php">Back to Cart</a>
-            <?php endif; ?>
-        </form>
+                            <option value="Online Transfer" <?php echo $payment_method === 'Online Transfer' ? 'selected' : ''; ?>>
+                                Online Transfer
+                            </option>
+
+                            <option value="Credit/Debit Card" <?php echo $payment_method === 'Credit/Debit Card' ? 'selected' : ''; ?>>
+                                Credit/Debit Card
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="notice" style="margin-bottom:1rem;">
+                        <strong>Payment Note:</strong><br>
+                        Cash on Delivery will place the order directly. Online Transfer and Credit/Debit Card will continue to the payment page.
+                    </div>
+
+                    <button class="btn" type="submit">
+                        Continue
+                    </button>
+
+                    <a class="btn secondary" href="cart.php" style="margin-top:0.75rem;">
+                        Back to Cart
+                    </a>
+
+                <?php endif; ?>
+            </form>
+        </div>
 
         <aside class="summary">
             <h2>Order Summary</h2>
 
-            <?php if (empty($cartItems)): ?>
-                <p class="small">No items selected.</p>
-            <?php else: ?>
+            <?php if (!empty($cartItems)): ?>
                 <?php foreach ($cartItems as $item): ?>
                     <div class="summary-row">
-                        <span><?php echo htmlspecialchars($item['book']['title']); ?> x <?php echo (int)$item['quantity']; ?></span>
-                        <strong>RM<?php echo number_format($item['line_total'], 2); ?></strong>
+                        <span>
+                            <?php echo htmlspecialchars($item['book']['title']); ?>
+                            x <?php echo (int)$item['quantity']; ?>
+                        </span>
+                        <strong>
+                            RM<?php echo number_format($item['line_total'], 2); ?>
+                        </strong>
                     </div>
                 <?php endforeach; ?>
-
-                <div class="summary-row"><span>Subtotal</span><strong>RM<?php echo number_format($subtotal, 2); ?></strong></div>
-                <div class="summary-row"><span>Delivery</span><strong>RM<?php echo number_format($delivery, 2); ?></strong></div>
-                <div class="summary-row total"><span>Total</span><span>RM<?php echo number_format($total, 2); ?></span></div>
-                <p class="notice" style="margin-top:1rem;">After checkout, the order and order item details will be stored in the database.</p>
             <?php endif; ?>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong>RM<?php echo number_format($subtotal, 2); ?></strong>
+            </div>
+
+            <div class="summary-row">
+                <span>Delivery</span>
+                <strong>RM<?php echo number_format($delivery, 2); ?></strong>
+            </div>
+
+            <div class="summary-row total">
+                <span>Total</span>
+                <span>RM<?php echo number_format($total, 2); ?></span>
+            </div>
         </aside>
+
     </div>
 </main>
 
 <footer class="footer">
     <div class="container footer-grid">
+
         <div>
             <h3>BookNest</h3>
             <p>Mini Online Bookstore e-commerce system.</p>
         </div>
+
         <div>
             <h4>Customer</h4>
             <a href="../books/books.php">Browse Books</a>
             <a href="cart.php">Shopping Cart</a>
             <a href="checkout.php">Checkout</a>
+            <a href="order-history.php">Order History</a>
         </div>
+
         <div>
             <h4>Admin</h4>
             <a href="../admin/admin-dashboard.php">Dashboard</a>
             <a href="../admin/manage-books.php">Manage Books</a>
             <a href="../admin/manage-orders.php">Manage Orders</a>
         </div>
+
     </div>
 </footer>
-<script src="../js/validation.js"></script>
+
 </body>
 </html>

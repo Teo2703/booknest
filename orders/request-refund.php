@@ -22,8 +22,11 @@ if ($order['status'] !== 'Completed') {
     exit();
 }
 
-// Check if a refund was already requested for this order
-$checkStmt = $conn->prepare("SELECT refund_id FROM refunds WHERE order_id = ?");
+// Block only if there's already a Pending or Approved refund — Rejected ones can be resubmitted
+$checkStmt = $conn->prepare("
+    SELECT refund_id FROM refunds 
+    WHERE order_id = ? AND status IN ('Pending', 'Approved')
+");
 $checkStmt->bind_param("i", $order_id);
 $checkStmt->execute();
 $existing = $checkStmt->get_result()->fetch_assoc();
@@ -39,15 +42,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($reason === '') {
         $error = "Please provide a reason for the refund.";
     } else {
-        $stmt = $conn->prepare("
-            INSERT INTO refunds (order_id, user_id, reason, amount, status)
-            VALUES (?, ?, ?, ?, 'Pending')
-        ");
-        $stmt->bind_param("iisd", $order_id, $user_id, $reason, $order['total_amount']);
-        $stmt->execute();
+        try {
+            $conn->begin_transaction();
 
-        header("Location: order-history.php?refund_requested=" . $order_id);
-        exit();
+            $stmt = $conn->prepare("
+                INSERT INTO refunds (order_id, reason, amount, status)
+                VALUES (?, ?, ?, 'Pending')
+            ");
+            $stmt->bind_param("isd", $order_id, $reason, $order['total_amount']);
+            $stmt->execute();
+
+            // Log the refund request in the order's tracking timeline
+            $historyStmt = $conn->prepare("
+                INSERT INTO order_status_history (order_id, status, changed_by_user_id, note)
+                VALUES (?, ?, ?, ?)
+            ");
+            $historyStatus = 'Refund Requested';
+            $historyNote = 'Customer requested refund: ' . $reason;
+            $historyStmt->bind_param("isis", $order_id, $historyStatus, $user_id, $historyNote);
+            $historyStmt->execute();
+
+            $conn->commit();
+
+            header("Location: order-history.php?refund_requested=" . $order_id);
+            exit();
+
+        } catch (Exception $e) {
+            $conn->rollback();
+            $error = "Could not submit refund request. Please try again.";
+        }
     }
 }
 ?>

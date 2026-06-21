@@ -143,6 +143,7 @@ $topBooks = $conn->query("
                 <a href="admin-dashboard.php">Dashboard</a>
                 <a href="manage-books.php">Manage Books</a>
                 <a href="manage-orders.php">Manage Orders</a>
+                <a href="manage-refunds.php">Manage Refunds</a>
                 <a class="active" href="analytics.php">Analytics</a>
                 <a href="../auth/logout.php">Logout</a>
             </aside>

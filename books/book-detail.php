@@ -28,8 +28,7 @@ if (isCustomer()) {
         FROM order_items
         JOIN orders ON order_items.order_id = orders.order_id
         LEFT JOIN reviews ON reviews.order_id = orders.order_id 
-            AND reviews.book_id = order_items.book_id 
-            AND reviews.user_id = orders.user_id
+            AND reviews.book_id = order_items.book_id
         WHERE orders.user_id = ?
           AND order_items.book_id = ?
           AND orders.status = 'Completed'
@@ -50,7 +49,8 @@ if (isCustomer()) {
 $reviewsStmt = $conn->prepare("
     SELECT reviews.rating, reviews.comment, reviews.created_at, users.name
     FROM reviews
-    JOIN users ON reviews.user_id = users.user_id
+    JOIN orders ON reviews.order_id = orders.order_id
+    JOIN users ON orders.user_id = users.user_id
     WHERE reviews.book_id = ?
     ORDER BY reviews.created_at DESC
 ");

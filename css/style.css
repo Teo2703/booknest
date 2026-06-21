@@ -390,7 +390,29 @@ td .btn {
 .timeline::before {
     display: none;
 }
+.status.refund-pending {
+    background: #fff3cd;
+    color: #856404;
+}
 
+.status.refund-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.timeline-item.refund-pending .timeline-dot,
+
+.timeline-item.refund-requested .timeline-dot {
+    background: #856404;
+}
+
+.timeline-item.refund-rejected .timeline-dot {
+    background: #721c24;
+}
+
+.timeline-item.refund-approved .timeline-dot {
+    background: #2e7d32;
+}
 /* CIRCLE */
 .circle {
     width: 20px;

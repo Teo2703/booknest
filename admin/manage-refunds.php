@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                 $historyStmt = $conn->prepare("
                     INSERT INTO order_status_history (order_id, status, changed_by_user_id, note)
-                    VALUES (?, 'Refunded', ?, 'Refund approved by admin')
+                    VALUES (?, 'Refund Approved', ?, 'Refund approved by admin')
                 ");
                 $historyStmt->bind_param("ii", $refund['order_id'], $_SESSION['user_id']);
                 $historyStmt->execute();
@@ -45,6 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $updateRefund = $conn->prepare("UPDATE refunds SET status = 'Rejected', resolved_at = NOW() WHERE refund_id = ?");
                 $updateRefund->bind_param("i", $refund_id);
                 $updateRefund->execute();
+
+                $historyStmt = $conn->prepare("
+                    INSERT INTO order_status_history (order_id, status, changed_by_user_id, note)
+                    VALUES (?, 'Refund Rejected', ?, 'Refund rejected by admin')
+                ");
+                $historyStmt->bind_param("ii", $refund['order_id'], $_SESSION['user_id']);
+                $historyStmt->execute();
 
                 $message = "Refund request rejected.";
             }
@@ -71,7 +78,8 @@ $refunds = $conn->query("
         users.name AS customer_name,
         users.email AS customer_email
     FROM refunds
-    JOIN users ON refunds.user_id = users.user_id
+    JOIN orders ON refunds.order_id = orders.order_id
+    JOIN users ON orders.user_id = users.user_id
     ORDER BY 
         CASE refunds.status WHEN 'Pending' THEN 0 ELSE 1 END,
         refunds.requested_at DESC

@@ -63,18 +63,16 @@ if (!empty($ordersList)) {
         $historyByOrder[(int)$history['order_id']][] = $history;
     }
 
-    // Get the latest refund request per order, so we know if Pending/Rejected/Approved
+    // Get the latest refund request per order (by refund_id, not timestamp)
     $refundSql = "
-        SELECT refunds.order_id, refunds.status, refunds.requested_at
-        FROM refunds
-        INNER JOIN (
-            SELECT order_id, MAX(requested_at) AS latest_request
-            FROM refunds
-            WHERE order_id IN ($placeholders)
-            GROUP BY order_id
-        ) latest 
-            ON refunds.order_id = latest.order_id 
-            AND refunds.requested_at = latest.latest_request
+        SELECT r.order_id, r.status
+        FROM refunds r
+        WHERE r.refund_id = (
+            SELECT MAX(r2.refund_id)
+            FROM refunds r2
+            WHERE r2.order_id = r.order_id
+        )
+        AND r.order_id IN ($placeholders)
     ";
 
     $refundStmt = $conn->prepare($refundSql);
@@ -94,7 +92,7 @@ if (!empty($ordersList)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order History | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css?v=123">
+    <link rel="stylesheet" href="../css/style.css?v=124">
 </head>
 <body>
 
@@ -177,6 +175,17 @@ if (!empty($ordersList)) {
                                 }
                                 $orderIdInt = (int)$order['order_id'];
                                 $latestRefundStatus = $latestRefundByOrder[$orderIdInt] ?? null;
+
+                                // Decide what the Status badge should display
+                                $displayStatus = $order['status'];
+                                if ($order['status'] === 'Completed') {
+                                    if ($latestRefundStatus === 'Pending') {
+                                        $displayStatus = 'Refund Pending';
+                                    } elseif ($latestRefundStatus === 'Rejected') {
+                                        $displayStatus = 'Refund Rejected';
+                                    }
+                                }
+                                $displayStatusClass = strtolower(str_replace(' ', '-', trim($displayStatus)));
                             ?>
                             <tr>
                                 <td>#BN<?php echo str_pad($order['order_id'], 4, '0', STR_PAD_LEFT); ?></td>
@@ -193,8 +202,8 @@ if (!empty($ordersList)) {
                                 </td>
                                 <td>RM<?php echo number_format($order['total_amount'], 2); ?></td>
                                 <td>
-                                    <span class="status <?php echo strtolower(trim($order['status'])); ?>">
-                                        <?php echo htmlspecialchars($order['status']); ?>
+                                    <span class="status <?php echo $displayStatusClass; ?>">
+                                        <?php echo htmlspecialchars($displayStatus); ?>
                                     </span>
                                 </td>
                                 <td>
@@ -211,17 +220,10 @@ if (!empty($ordersList)) {
                                            onclick="return confirm('Cancel this order?')">Cancel</a>
                                     <?php endif; ?>
 
-                                    <?php if ($order['status'] === 'Refunded'): ?>
-                                        <span class="small">Refunded</span>
-
-                                    <?php elseif ($latestRefundStatus === 'Pending'): ?>
-                                        <span class="small">Refund Pending</span>
-
-                                    <?php elseif ($latestRefundStatus === 'Rejected'): ?>
-                                        <span class="small">Refund Rejected</span>
-
-                                    <?php elseif ($order['status'] === 'Completed'): ?>
-                                        <a class="btn secondary" href="request-refund.php?id=<?php echo $orderIdInt; ?>">Refund</a>
+                                    <?php if ($order['status'] === 'Completed'): ?>
+                                        <a class="btn secondary" href="request-refund.php?id=<?php echo $orderIdInt; ?>">
+                                            <?php echo $latestRefundStatus === 'Rejected' ? 'Request Again' : 'Refund'; ?>
+                                        </a>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -263,7 +265,7 @@ if (!empty($ordersList)) {
                                     <div class="notice">No tracking history available.</div>
                                 <?php else: ?>
                                     <?php foreach ($trackingHistory as $history): ?>
-                                        <div class="timeline-item <?php echo strtolower(trim($history['status'])); ?>">
+                                        <div class="timeline-item <?php echo strtolower(str_replace(' ', '-', trim($history['status']))); ?>">
                                             <div class="timeline-dot"></div>
 
                                             <div class="timeline-content">

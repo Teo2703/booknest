@@ -39,10 +39,10 @@ if (!$verified) {
 
 try {
     $stmt = $conn->prepare("
-        INSERT INTO reviews (book_id, user_id, order_id, rating, comment)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO reviews (book_id, order_id, rating, comment)
+        VALUES (?, ?, ?, ?)
     ");
-    $stmt->bind_param("iiiis", $book_id, $user_id, $order_id, $rating, $comment);
+    $stmt->bind_param("iiis", $book_id, $order_id, $rating, $comment);
     $stmt->execute();
 
     header("Location: book-detail.php?id=" . $book_id . "&review_success=1");

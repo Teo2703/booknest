@@ -136,4 +136,6 @@ $isHome = basename($_SERVER['SCRIPT_NAME']) === 'index.php';
     </div>
 </header>
 
-<?php include __DIR__ . '/../chatbot/chatbot.php'; ?>
+<?php if (!isAdmin()): ?>
+    <?php include __DIR__ . '/../chatbot/chatbot.php'; ?>
+<?php endif; ?>

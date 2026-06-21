@@ -76,15 +76,6 @@ $orders = $stmt->get_result();
 </head>
 
 <body>
-
-    <!-- Top Bar -->
-    <div class="topbar">
-        <div class="container">
-            <span>Mini Online Bookstore</span>
-            <span>Admin order management</span>
-        </div>
-    </div>
-
     <!-- Navigation Bar -->
     <header class="navbar">
         <div class="container nav-inner">
@@ -106,16 +97,7 @@ $orders = $stmt->get_result();
     <!-- Main Section -->
     <main class="section">
         <div class="container admin-layout">
-
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <a href="admin-dashboard.php">Dashboard</a>
-                <a href="manage-books.php">Manage Books</a>
-                <a class="active" href="manage-orders.php">Manage Orders</a>
-                <a href="manage-refunds.php">Manage Refunds</a>
-                <a href="analytics.php">Analytics</a>
-                <a href="../auth/logout.php">Logout</a>
-            </aside>
+          <?php include __DIR__ . '/../includes/admin-sidebar.php'; ?>
 
             <!-- Manage Orders Content -->
             <section>

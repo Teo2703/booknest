@@ -89,12 +89,12 @@ $error = isset($_GET['error']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Messages | BookNest</title>
-    <link rel="stylesheet" href="../css/style.css?v=161">
+    <link rel="stylesheet" href="../css/style.css?v=170">
 
     <style>
         .message-layout {
             display: grid;
-            grid-template-columns: 320px minmax(0, 1fr);
+            grid-template-columns: 300px minmax(0, 1fr);
             gap: 1.5rem;
             align-items: flex-start;
         }
@@ -105,6 +105,7 @@ $error = isset($_GET['error']);
             border: 1px solid #e7d8c8;
             border-radius: 24px;
             overflow: hidden;
+            box-shadow: var(--shadow);
         }
 
         .customer-list h2,
@@ -131,6 +132,7 @@ $error = isset($_GET['error']);
 
         .customer-link strong {
             display: block;
+            margin-bottom: 0.25rem;
         }
 
         .badge {
@@ -198,7 +200,7 @@ $error = isset($_GET['error']);
             color: #6d5f55;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
             .message-layout {
                 grid-template-columns: 1fr;
             }
@@ -208,26 +210,7 @@ $error = isset($_GET['error']);
 
 <body>
 
-<div class="topbar">
-    <div class="container">
-        <span>BookNest Admin</span>
-        <span>Customer feedback and support messages</span>
-    </div>
-</div>
-
-<header class="navbar">
-    <div class="container nav-inner">
-        <a class="brand" href="admin-dashboard.php">Book<span>Nest</span> Admin</a>
-
-        <nav class="nav-links">
-            <a href="admin-dashboard.php">Dashboard</a>
-            <a href="manage-books.php">Manage Books</a>
-            <a href="manage-orders.php">Manage Orders</a>
-            <a class="active" href="customer-messages.php">Messages</a>
-            <a href="../auth/logout.php">Logout</a>
-        </nav>
-    </div>
-</header>
+<?php include __DIR__ . '/../includes/navigation.php'; ?>
 
 <section class="page-title">
     <div class="container">
@@ -240,117 +223,137 @@ $error = isset($_GET['error']);
 <main class="section">
     <div class="container">
 
-        <?php if ($success): ?>
-            <div class="notice" style="margin-bottom:1rem;">
-                Reply sent successfully.
-            </div>
-        <?php endif; ?>
+        <div class="admin-layout">
 
-        <?php if ($error): ?>
-            <div class="notice" style="margin-bottom:1rem;">
-                Reply cannot be empty.
-            </div>
-        <?php endif; ?>
+            <?php include __DIR__ . '/../includes/admin-sidebar.php'; ?>
 
-        <div class="message-layout">
+            <div>
 
-            <aside class="customer-list">
-                <h2>Customers</h2>
-
-                <?php if ($result->num_rows === 0): ?>
-                    <div class="empty-panel">
-                        No customer messages yet.
+                <?php if ($success): ?>
+                    <div class="notice" style="margin-bottom:1rem;">
+                        Reply sent successfully.
                     </div>
-                <?php else: ?>
-
-                    <?php while ($customer = $result->fetch_assoc()): ?>
-                        <?php
-                            $customerId = (int)$customer['user_id'];
-                            $activeClass = $customerId === $selectedUserId ? 'active' : '';
-                            $unread = (int)$customer['unread_count'];
-                        ?>
-
-                        <a 
-                            class="customer-link <?php echo $activeClass; ?>" 
-                            href="customer-messages.php?user_id=<?php echo $customerId; ?>"
-                        >
-                            <strong><?php echo htmlspecialchars($customer['name']); ?></strong>
-                            <span class="small"><?php echo htmlspecialchars($customer['email']); ?></span><br>
-
-                            <span class="small">
-                                Latest: 
-                                <?php echo date("d M Y, h:i A", strtotime($customer['latest_message_time'])); ?>
-                            </span>
-
-                            <?php if ($unread > 0): ?>
-                                <span class="badge">
-                                    <?php echo $unread; ?> new
-                                </span>
-                            <?php endif; ?>
-                        </a>
-                    <?php endwhile; ?>
-
                 <?php endif; ?>
-            </aside>
 
-            <section class="admin-chat-card">
-
-                <?php if (!$selectedUser): ?>
-
-                    <div class="empty-panel">
-                        Select a customer from the left to view messages.
+                <?php if ($error): ?>
+                    <div class="notice" style="margin-bottom:1rem;">
+                        Reply cannot be empty.
                     </div>
+                <?php endif; ?>
 
-                <?php else: ?>
+                <div class="message-layout">
 
-                    <div class="admin-chat-header">
-                        <h2 style="margin:0;">
-                            Chat with <?php echo htmlspecialchars($selectedUser['name']); ?>
-                        </h2>
-                        <p style="margin:0.3rem 0 0;">
-                            <?php echo htmlspecialchars($selectedUser['email']); ?>
-                        </p>
-                    </div>
+                    <aside class="customer-list">
+                        <h2>Customers</h2>
 
-                    <div class="admin-chat-messages" id="adminChatMessages">
-                        <?php foreach ($messagesList as $msg): ?>
-                            <?php
-                                $role = $msg['sender_role'];
-                                $bubbleClass = $role === 'admin' ? 'admin' : 'customer';
-                                $senderLabel = $role === 'admin' ? 'Admin' : 'Customer';
-                            ?>
-
-                            <div class="chat-bubble <?php echo $bubbleClass; ?>">
-                                <?php echo nl2br(htmlspecialchars($msg['message'])); ?>
-
-                                <span class="chat-meta">
-                                    <?php echo htmlspecialchars($senderLabel); ?> ·
-                                    <?php echo date("d M Y, h:i A", strtotime($msg['created_at'])); ?>
-                                </span>
+                        <?php if ($result->num_rows === 0): ?>
+                            <div class="empty-panel">
+                                No customer messages yet.
                             </div>
-                        <?php endforeach; ?>
-                    </div>
+                        <?php else: ?>
 
-                    <form class="reply-form" method="POST" action="reply-message.php">
-                        <input type="hidden" name="user_id" value="<?php echo (int)$selectedUser['user_id']; ?>">
+                            <?php while ($customer = $result->fetch_assoc()): ?>
+                                <?php
+                                    $customerId = (int)$customer['user_id'];
+                                    $activeClass = $customerId === $selectedUserId ? 'active' : '';
+                                    $unread = (int)$customer['unread_count'];
+                                ?>
 
-                        <div class="field">
-                            <label>Admin Reply</label>
-                            <textarea 
-                                name="message" 
-                                placeholder="Type your reply here..."
-                                required
-                            ></textarea>
-                        </div>
+                                <a 
+                                    class="customer-link <?php echo $activeClass; ?>" 
+                                    href="customer-messages.php?user_id=<?php echo $customerId; ?>"
+                                >
+                                    <strong><?php echo htmlspecialchars($customer['name']); ?></strong>
 
-                        <button class="btn" type="submit">
-                            Send Reply
-                        </button>
-                    </form>
+                                    <span class="small">
+                                        <?php echo htmlspecialchars($customer['email']); ?>
+                                    </span>
+                                    <br>
 
-                <?php endif; ?>
+                                    <span class="small">
+                                        Latest: 
+                                        <?php echo date("d M Y, h:i A", strtotime($customer['latest_message_time'])); ?>
+                                    </span>
 
-            </section>
+                                    <?php if ($unread > 0): ?>
+                                        <br>
+                                        <span class="badge">
+                                            <?php echo $unread; ?> new
+                                        </span>
+                                    <?php endif; ?>
+                                </a>
+                            <?php endwhile; ?>
+
+                        <?php endif; ?>
+                    </aside>
+
+                    <section class="admin-chat-card">
+
+                        <?php if (!$selectedUser): ?>
+
+                            <div class="empty-panel">
+                                Select a customer from the left to view messages.
+                            </div>
+
+                        <?php else: ?>
+
+                            <div class="admin-chat-header">
+                                <h2 style="margin:0;">
+                                    Chat with <?php echo htmlspecialchars($selectedUser['name']); ?>
+                                </h2>
+
+                                <p style="margin:0.3rem 0 0;">
+                                    <?php echo htmlspecialchars($selectedUser['email']); ?>
+                                </p>
+                            </div>
+
+                            <div class="admin-chat-messages" id="adminChatMessages">
+                                <?php foreach ($messagesList as $msg): ?>
+                                    <?php
+                                        $role = $msg['sender_role'];
+                                        $bubbleClass = $role === 'admin' ? 'admin' : 'customer';
+                                        $senderLabel = $role === 'admin' ? 'Admin' : 'Customer';
+                                    ?>
+
+                                    <div class="chat-bubble <?php echo $bubbleClass; ?>">
+                                        <?php echo nl2br(htmlspecialchars($msg['message'])); ?>
+
+                                        <span class="chat-meta">
+                                            <?php echo htmlspecialchars($senderLabel); ?> ·
+                                            <?php echo date("d M Y, h:i A", strtotime($msg['created_at'])); ?>
+                                        </span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <form class="reply-form" method="POST" action="reply-message.php">
+                                <input 
+                                    type="hidden" 
+                                    name="user_id" 
+                                    value="<?php echo (int)$selectedUser['user_id']; ?>"
+                                >
+
+                                <div class="field">
+                                    <label>Admin Reply</label>
+                                    <textarea 
+                                        name="message" 
+                                        placeholder="Type your reply here..."
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                <button class="btn" type="submit">
+                                    Send Reply
+                                </button>
+                            </form>
+
+                        <?php endif; ?>
+
+                    </section>
+
+                </div>
+
+            </div>
 
         </div>
 
@@ -369,6 +372,7 @@ $error = isset($_GET['error']);
             <a href="admin-dashboard.php">Dashboard</a>
             <a href="manage-books.php">Manage Books</a>
             <a href="manage-orders.php">Manage Orders</a>
+            <a href="manage-refunds.php">Manage Refunds</a>
             <a href="customer-messages.php">Customer Messages</a>
         </div>
     </div>
@@ -376,6 +380,7 @@ $error = isset($_GET['error']);
 
 <script>
 const adminChatMessages = document.getElementById("adminChatMessages");
+
 if (adminChatMessages) {
     adminChatMessages.scrollTop = adminChatMessages.scrollHeight;
 }

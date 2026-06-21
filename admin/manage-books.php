@@ -42,13 +42,6 @@ $lowStockCount = count($lowStockBooks);
 
 <body>
 
-<div class="topbar">
-    <div class="container">
-        <span>Mini Online Bookstore</span>
-        <span>Admin book management</span>
-    </div>
-</div>
-
 <header class="navbar">
     <div class="container nav-inner">
         <a class="brand" href="admin-dashboard.php">

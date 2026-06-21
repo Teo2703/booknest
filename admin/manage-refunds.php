@@ -96,13 +96,6 @@ $refunds = $conn->query("
 </head>
 <body>
 
-<div class="topbar">
-    <div class="container">
-        <span>Mini Online Bookstore</span>
-        <span>Admin refund management</span>
-    </div>
-</div>
-
 <?php include __DIR__ . '/../includes/navigation.php'; ?>
 
 <section class="page-title">
@@ -116,14 +109,7 @@ $refunds = $conn->query("
 <main class="section">
     <div class="container admin-layout">
 
-        <aside class="sidebar">
-            <a href="admin-dashboard.php">Dashboard</a>
-            <a href="manage-books.php">Manage Books</a>
-            <a href="manage-orders.php">Manage Orders</a>
-            <a class="active" href="manage-refunds.php">Manage Refunds</a>
-            <a href="../auth/logout.php">Logout</a>
-        </aside>
-
+        <?php include __DIR__ . '/../includes/admin-sidebar.php'; ?>
         <section>
 
             <?php if ($message !== ''): ?>

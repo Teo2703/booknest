@@ -294,12 +294,12 @@ if (!empty($ordersList)) {
                                 </div>
                             </div>
 
-                            <div class="timeline">
+                            <div class="tracking-timeline">
                                 <?php if (empty($trackingHistory)): ?>
                                     <div class="notice">No tracking history available.</div>
                                 <?php else: ?>
                                     <?php foreach ($trackingHistory as $history): ?>
-                                        <div class="timeline-item <?php echo strtolower(str_replace(' ', '-', trim($history['status']))); ?>">
+                                        <div class="timeline-step <?php echo strtolower(str_replace(' ', '-', trim($history['status']))); ?>">
                                             <div class="timeline-dot"></div>
 
                                             <div class="timeline-content">

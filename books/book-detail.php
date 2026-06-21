@@ -149,7 +149,7 @@ $bookReviews = $reviewsStmt->get_result();
         </div>
 
         <div class="container">
-            <div class="form-card" style="margin-top:1.5rem;">
+            <div class="form-card" style="margin-top:1.5rem;" id="reviews">
                 <h2>Reviews</h2>
 
                 <?php if (isset($_GET['review_success'])): ?>

@@ -306,7 +306,15 @@ if (!empty($ordersList)) {
                                                 <?php endif; ?>
                                             </div>
                                         <?php endforeach; ?>
-                                        <span class="small">Total items: <?php echo (int)$order['item_count']; ?></span>
+                                        <?php
+                                            $totalItems = 0;
+
+                                            foreach ($orderItems as $item) {
+                                                $totalItems += (int)$item['quantity'];
+                                            }
+                                            ?>
+
+                                            <span class="small">Total items: <?php echo $totalItems; ?></span>
                                     <?php endif; ?>
                                 </td>
 

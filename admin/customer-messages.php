@@ -210,8 +210,6 @@ $error = isset($_GET['error']);
 
 <body>
 
-<?php include __DIR__ . '/../includes/navigation.php'; ?>
-
 <section class="page-title">
     <div class="container">
         <p class="eyebrow">Admin Support</p>

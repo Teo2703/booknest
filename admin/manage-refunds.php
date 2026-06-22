@@ -96,8 +96,6 @@ $refunds = $conn->query("
 </head>
 <body>
 
-<?php include __DIR__ . '/../includes/navigation.php'; ?>
-
 <section class="page-title">
     <div class="container">
         <p class="eyebrow">Admin Area</p>

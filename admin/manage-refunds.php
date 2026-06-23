@@ -158,12 +158,12 @@ $refunds = $conn->query("
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="refund_id" value="<?php echo $r['refund_id']; ?>">
                                         <input type="hidden" name="action" value="approve">
-                                        <button class="btn secondary" type="submit" onclick="return confirm('Approve this refund?')">Approve</button>
+                                        <button class="btn secondary approve-btn" type="submit" onclick="return confirm('Approve this refund?')">Approve</button>
                                     </form>
                                     <form method="POST" style="display:inline;">
                                         <input type="hidden" name="refund_id" value="<?php echo $r['refund_id']; ?>">
                                         <input type="hidden" name="action" value="reject">
-                                        <button class="btn danger" type="submit" onclick="return confirm('Reject this refund?')">Reject</button>
+                                        <button class="btn danger reject-btn" type="submit" onclick="return confirm('Reject this refund?')">Reject</button>
                                     </form>
                                 <?php else: ?>
                                     <span class="small">Resolved <?php echo date("d M Y", strtotime($r['resolved_at'])); ?></span>

@@ -117,12 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <main class="section">
     <div class="container admin-layout">
 
-        <aside class="sidebar">
-            <a href="admin-dashboard.php">Dashboard</a>
-            <a class="active" href="manage-books.php">Manage Books</a>
-            <a href="manage-orders.php">Manage Orders</a>
-            <a href="index.html">Logout</a>
-        </aside>
+    <?php include __DIR__ . '/../includes/admin-sidebar.php'; ?>
 
         <section>
            <form id="edit-book" class="form-card" method="POST" enctype="multipart/form-data" novalidate>

@@ -160,7 +160,7 @@ a {
     background: #219150;
 }
 
-.edit-btn {
+.edit-btn, .approve-btn {
     height: 40px;
     width: 70px;
     margin-bottom: 10px;
@@ -271,7 +271,7 @@ a {
     background: #219150;
 }
 
-.delete-btn {
+.delete-btn, .reject-btn {
     height: 40px;
 }
 
@@ -835,8 +835,8 @@ th {
 }
 
 .status.refunded {
-    background: #dff4e8;
-    color: #fffb00;
+    background: #fceaea;
+    color: #b33939;
 }
 
 /* Admin Layout */

@@ -834,6 +834,11 @@ th {
     color: #216241;
 }
 
+.status.refunded {
+    background: #dff4e8;
+    color: #fffb00;
+}
+
 /* Admin Layout */
 .admin-layout {
     display: grid;

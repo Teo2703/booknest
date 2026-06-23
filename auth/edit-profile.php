@@ -73,12 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if ($updateStmt->execute()) {
                 $_SESSION["name"] = $name;
-                $success = "Profile updated successfully.";
 
-                $stmt = $conn->prepare("SELECT user_id, name, email, contact, role FROM users WHERE user_id = ?");
-                $stmt->bind_param("i", $user_id);
-                $stmt->execute();
-                $user = $stmt->get_result()->fetch_assoc();
+                header("Location: profile.php?updated=1");
+                exit();
             } else {
                 $error = "Unable to update profile. Please try again.";
             }

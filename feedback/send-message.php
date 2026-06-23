@@ -17,8 +17,8 @@ if ($message === '') {
 
 $stmt = $conn->prepare("
     INSERT INTO customer_messages 
-    (user_id, sender_role, message, is_read) 
-    VALUES (?, 'customer', ?, 0)
+    (user_id, sender_role, message, is_read, created_at) 
+    VALUES (?, 'customer', ?, 0, NOW())
 ");
 
 if (!$stmt) {

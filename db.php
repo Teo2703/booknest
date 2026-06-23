@@ -41,6 +41,7 @@ if (file_exists($configPath)) {
 
         if ($connected) {
             $conn->set_charset("utf8mb4");
+            $conn->query("SET time_zone = '+08:00'");
         } else {
             $lastError = mysqli_connect_error();
             $conn = null;

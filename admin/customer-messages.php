@@ -2,6 +2,16 @@
 include '../app.php';
 requireAdmin();
 
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
+function formatChatTime($datetime) {
+    if (empty($datetime)) {
+        return '';
+    }
+
+    return date("d M Y, h:i A", strtotime($datetime));
+}
+
 $sql = "
     SELECT 
         users.user_id,
@@ -270,7 +280,7 @@ $error = isset($_GET['error']);
 
                                     <span class="small">
                                         Latest: 
-                                        <?php echo date("d M Y, h:i A", strtotime($customer['latest_message_time'])); ?>
+                                        <?php echo formatChatTime($customer['latest_message_time']); ?>
                                     </span>
 
                                     <?php if ($unread > 0): ?>
@@ -318,7 +328,7 @@ $error = isset($_GET['error']);
 
                                         <span class="chat-meta">
                                             <?php echo htmlspecialchars($senderLabel); ?> ·
-                                            <?php echo date("d M Y, h:i A", strtotime($msg['created_at'])); ?>
+                                            <?php echo formatChatTime($msg['created_at']); ?>
                                         </span>
                                     </div>
                                 <?php endforeach; ?>

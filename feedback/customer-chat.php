@@ -4,6 +4,16 @@ requireCustomer();
 
 $user_id = (int)$_SESSION['user_id'];
 
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
+function formatChatTime($datetime) {
+    if (empty($datetime)) {
+        return '';
+    }
+
+    return $date->format("d M Y, h:i A");
+}
+
 $stmt = $conn->prepare("
     SELECT 
         customer_messages.message_id,
@@ -203,7 +213,7 @@ $error = isset($_GET['error']);
 
                             <span class="chat-meta">
                                 <?php echo htmlspecialchars($senderLabel); ?> ·
-                                <?php echo date("d M Y, h:i A", strtotime($msg['created_at'])); ?>
+                                <?php echo formatChatTime($msg['created_at']); ?>
                             </span>
                         </div>
                     <?php endforeach; ?>

@@ -94,7 +94,7 @@ $orderCount = $orderStmt->get_result()->fetch_assoc()["total_orders"];
             </div>
 
             <div class="actions2">
-                <a class="btn" href="../books/books.php">Browse Books</a>
+                <a class="btn" href="edit-profile.php">Edit Profile</a>
                 <a class="btn secondary view-btn" href="../orders/order-history.php">View Orders</a>
                 <a class="btn danger logout-btn" href="logout.php">Logout</a>
             </div>

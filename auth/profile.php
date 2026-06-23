@@ -57,6 +57,11 @@ $orderCount = $orderStmt->get_result()->fetch_assoc()["total_orders"];
     <div class="container auth">
         <div class="form-card">
             <h2>Profile Information</h2>
+            <?php if (isset($_GET['updated'])): ?>
+                <div class="notice" style="color:#216241;margin-bottom:1rem;">
+                    Profile updated successfully.
+                </div>
+            <?php endif; ?>
 
             <div class="summary-row">
                 <span>Customer ID</span>

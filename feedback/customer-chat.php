@@ -11,7 +11,7 @@ function formatChatTime($datetime) {
         return '';
     }
 
-    return $date->format("d M Y, h:i A");
+    return date("d M Y, h:i A", strtotime($datetime));
 }
 
 $stmt = $conn->prepare("

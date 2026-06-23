@@ -57,6 +57,11 @@ $orderCount = $orderStmt->get_result()->fetch_assoc()["total_orders"];
     <div class="container auth">
         <div class="form-card">
             <h2>Profile Information</h2>
+            <?php if (isset($_GET['updated'])): ?>
+                <div class="notice" style="color:#216241;margin-bottom:1rem;">
+                    Profile updated successfully.
+                </div>
+            <?php endif; ?>
 
             <div class="summary-row">
                 <span>Customer ID</span>
@@ -94,7 +99,7 @@ $orderCount = $orderStmt->get_result()->fetch_assoc()["total_orders"];
             </div>
 
             <div class="actions2">
-                <a class="btn" href="../books/books.php">Browse Books</a>
+                <a class="btn" href="edit-profile.php">Edit Profile</a>
                 <a class="btn secondary view-btn" href="../orders/order-history.php">View Orders</a>
                 <a class="btn danger logout-btn" href="logout.php">Logout</a>
             </div>

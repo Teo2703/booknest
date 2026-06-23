@@ -160,7 +160,7 @@ a {
     background: #219150;
 }
 
-.edit-btn {
+.edit-btn, .approve-btn {
     height: 40px;
     width: 70px;
     margin-bottom: 10px;
@@ -271,7 +271,7 @@ a {
     background: #219150;
 }
 
-.delete-btn {
+.delete-btn, .reject-btn {
     height: 40px;
 }
 
@@ -814,7 +814,7 @@ th {
     display: inline-block;
 }
 
-.status.cancelled {
+.status.cancelled, .status.rejected {
     background: #fde2e2;
     color: #c0392b;
 }
@@ -829,9 +829,14 @@ th {
     color: #2d5d8a;
 }
 
-.status.completed {
+.status.completed, .status.approved {
     background: #dff4e8;
     color: #216241;
+}
+
+.status.refunded {
+    background: #fceaea;
+    color: #b33939;
 }
 
 /* Admin Layout */

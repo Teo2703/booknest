@@ -157,6 +157,67 @@ if (!empty($ordersList)) {
             vertical-align: top;
         }
 
+        .order-item-row {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.35rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .order-item-title {
+            line-height: 1.3;
+        }
+
+        .review-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .review-btn-rate {
+            background: #7b4b2a;
+            color: #fff;
+            font-weight: 700;
+            padding: 0.4rem 0.85rem;
+            border-radius: 6px;
+            text-decoration: none;
+            border: 1px solid #7b4b2a;
+            transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        .review-btn-rate:hover {
+            background: #663d20;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+        }
+
+        .review-btn-rate:active {
+            transform: translateY(0);
+        }
+
+        .review-pill-done {
+            background: #e7f8f1;
+            color: #1d9e75;
+            border: 1px solid #b9ecd6;
+            font-weight: 700;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+        }
+
+        .review-pill-blocked {
+            background: #f1f1f1;
+            color: #888;
+            border: 1px solid #ddd;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+        }
+
         @media (max-width: 900px) {
             .table-wrap {
                 overflow-x: auto;
@@ -291,18 +352,24 @@ if (!empty($ordersList)) {
                                     <?php else: ?>
                                         <?php foreach ($orderItems as $item): ?>
                                             <?php $alreadyReviewed = isset($reviewedBooks[$orderIdInt][$item['book_id']]); ?>
-                                            <div style="margin-bottom:0.3rem;">
-                                                <?php echo htmlspecialchars($item['title']); ?> x <?php echo (int)$item['quantity']; ?>
+                                            <div class="order-item-row">
+                                                <span class="order-item-title">
+                                                    <?php echo htmlspecialchars($item['title']); ?> x <?php echo (int)$item['quantity']; ?>
+                                                </span>
 
-                                                <?php if ($order['status'] === 'Completed'): ?>
+                                                <?php if ($displayStatus === 'Completed'): ?>
                                                     <?php if ($alreadyReviewed): ?>
-                                                        <span class="small" style="color:#1d9e75;">Reviewed</span>
+                                                        <span class="review-pill review-pill-done">✓ Reviewed</span>
                                                     <?php else: ?>
-                                                        <a class="small" style="color:#7b4b2a;font-weight:700;"
+                                                        <a class="review-pill review-btn-rate"
                                                            href="../books/book-detail.php?id=<?php echo $item['book_id']; ?>#reviews">
-                                                            Rate this book
+                                                            ★ Rate this book
                                                         </a>
                                                     <?php endif; ?>
+                                                <?php elseif ($order['status'] === 'Completed'): ?>
+                                                    <span class="review-pill review-pill-blocked" title="This order isn't eligible for a review">
+                                                        Not eligible for review
+                                                    </span>
                                                 <?php endif; ?>
                                             </div>
                                         <?php endforeach; ?>

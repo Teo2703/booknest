@@ -14,14 +14,11 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
-SET @@SESSION.SQL_LOG_BIN= 0;
 
 --
 -- GTID state at the beginning of the backup 
 --
 
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '8fe91486-69ad-11f1-a255-c21288bad039:1-218';
 
 --
 -- Table structure for table `books`
@@ -71,7 +68,7 @@ CREATE TABLE `customer_messages` (
   PRIMARY KEY (`message_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `customer_messages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -134,7 +131,7 @@ CREATE TABLE `order_status_history` (
   KEY `fk_history_user` (`changed_by_user_id`),
   CONSTRAINT `fk_history_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_history_user` FOREIGN KEY (`changed_by_user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -203,7 +200,7 @@ CREATE TABLE `refunds` (
   PRIMARY KEY (`refund_id`),
   KEY `order_id` (`order_id`),
   CONSTRAINT `refunds_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -236,7 +233,7 @@ CREATE TABLE `reviews` (
   CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`book_id`),
   CONSTRAINT `reviews_ibfk_3` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
   CONSTRAINT `reviews_chk_1` CHECK ((`rating` between 1 and 5))
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -278,7 +275,6 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (1,'Admin User','admin@booknest.com','$2y$10$RGaXtTtoaR2pnDUsgt7PmeXIySBGwdYDyrh/kBOBHfyS4nN2u7rfi','admin','0123456789','2026-05-13 17:04:33'),(2,'Amanda Lee','amanda@example.com','$2y$10$ur78ic6/Lfe3ycu1g7CQoed3ZY1nxtYOutHCeprGJlG1L.OECYYaO','customer','0112222333','2026-05-13 17:04:33'),(3,'Tan Kai','tankai@example.com','$2y$10$d4XwEzm4VMcw1vDxiZuNO.QlX3ocZ47kEvl2Tomwqr5r1YnJzjMru','customer','0113333444','2026-05-13 17:04:33'),(4,'Test','test@example.com','$2y$10$fRG..0mSIZVBRRR9j1t8POR2xJ6aeU/2eSUrbxKcUUIo2S6PpUY42','customer','0123456889','2026-06-09 04:55:52');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
